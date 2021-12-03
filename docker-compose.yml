@@ -1,0 +1,73 @@
+version: '3'
+services:
+
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-server-flask
+    restart: unless-stopped
+    environment:
+      #GUNICORN_LOG_LEVEL - The granularity of log output
+      #A string of "debug", "info", "warning", "error", "critical"
+      GUNICORN_LOG_LEVEL: "debug"
+      #Setear la cantidad de workers a utilizar por Gunicorn
+      #https://devcenter.heroku.com/articles/python-gunicorn
+      GUNICORN_WORKERS: 4
+      #Setear en True or False, solo aplica para correr desde Python (o sea nunca)
+      APP_DEBUG: "True"
+      APP_PORT: 8000
+      #Setear la API KEY para el app server
+      APP_SERVER_API_KEY: "ef00a570-7cfc-4638-8cad-d085fd98b6e3"
+      #Datos para conectare a la DB
+      MONGODB_DATABASE: auth-server-db
+      MONGODB_USERNAME: authserveruser
+      MONGODB_PASSWORD: 123456
+      MONGODB_HOSTNAME: auth-server-mongodb
+      MONGODB_PORT: 27017
+    volumes:
+       - authserverlogs:/home/ubuntu/logs
+       - ".:/home/ubuntu/" 
+    ports:
+       - "80:8000"
+    depends_on:
+      - mongodb
+    networks:
+      - frontend
+      - backend
+
+  mongodb:
+    image: mongo:4.2.7
+    container_name: auth-server-mongodb
+    restart: unless-stopped
+    command: mongod --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sa
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+      MONGO_NON_ROOT_USERNAME: authserveruser
+      MONGO_NON_ROOT_PASSWORD: 123456
+      MONGODB_DATABASE: auth-server-db
+      MONGODB_DATA_DIR: /data/db
+      MONDODB_LOG_DIR: /dev/null
+    volumes:
+      - mongodbdata:/data/db
+      #Si el volumen de arriba no existe, corremos el script mongoinit.sh para agregar el usuario
+      #de aplicacion e inicializar la base de datos
+      - "./mongoinit/:/docker-entrypoint-initdb.d/"
+    #Exponemos el puerto para administrar la DB directamente, durante el desarrollo
+    #ports:
+       #- "27017:27017"
+    networks:
+      - backend
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  authserverlogs:
+    driver: local
+  mongodbdata:
+    driver: local
