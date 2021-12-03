@@ -22,6 +22,14 @@ El mismo consiste en la creación de un juego en 2D con mecánicas _roguelike_ c
 
 ## Herramientas Utilizadas
 
+- Docker
 - Python
 - Flask
 - Gunicorn
+
+## Ejecución (desarrollo local)
+
+- Bajar el código
+- Ejecutar en el root del repositorio: `docker-compose build`
+- Ejecutar en el root del repositorio: `docker-compose up`
+- El server estrá disponible en: **127.0.0.1:80**
