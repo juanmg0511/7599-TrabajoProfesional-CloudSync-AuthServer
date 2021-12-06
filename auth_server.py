@@ -21,7 +21,7 @@ from functools import wraps
 from flask_pymongo import PyMongo
 
 #Importacion de clases necesarias
-from src import home, helpers
+from src import home, users, helpers
 
 #Version de API y Server
 api_version = "1"
@@ -73,6 +73,7 @@ def on_starting(server):
 #Defincion de los endpoints del server
 api.add_resource(home.Home, "/")
 api.add_resource(home.Ping, "/ping")
+api.add_resource(users.AllUsers, api_path + "/users")
 
 # Inicio del server en forma directa con WSGI - toma el puerto y modo de las variables de entorno
 # PORT
