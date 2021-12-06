@@ -60,3 +60,36 @@ def return_request(message, status):
 #Funcion que devuelve el request id, o None si no aplica, formateado para el log default de Gunicorn
 def log_request_id():
     return "[" + str(current_request_id()) + "] "
+
+#Funcion que chequea si un string esta vacio
+def non_empty_string(s):
+    if not s:
+        raise ValueError("Must not be empty string.")
+    return s
+
+#Funcion que chequea si una fecha es valida
+def non_empty_date(d):    
+    try:
+        d = datetime.strptime(d, "%Y-%m-%d")
+    except:
+        raise ValueError("Must be valid date.")
+    return d
+
+#Funcion que chequea si un bool es valido
+def non_empty_bool(b):
+    if (str(b).lower() == "true"):
+        return True
+    else:
+        return False
+    
+#Funcion que chequea si un email es valido
+def non_empty_email(e):
+    if (re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", e) is None):
+        raise ValueError("Must be valid email.")
+    return e
+
+#Funcion que chequea si un avatar es valido
+def non_empty_avatar(a):
+    if (re.match(r"([(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\-\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))", a) is None):
+        raise ValueError("Must be valid URL.")
+    return a
