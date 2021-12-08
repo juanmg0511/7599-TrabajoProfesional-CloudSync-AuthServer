@@ -16,6 +16,8 @@ from flask_restful import Api, Resource, reqparse
 from flask_log_request_id import RequestID, RequestIDLogFilter, current_request_id
 from flask_cors import CORS
 from http import HTTPStatus
+#Passlib para encriptar contrasenias
+from passlib.apps import custom_app_context
 from functools import wraps
 #PyMongo para el manejo de MongoDB
 from flask_pymongo import PyMongo
