@@ -187,3 +187,73 @@ class AllUsers(Resource):
         UserResponsePost.pop("password", None)
         
         return helpers.return_request(UserResponsePost, HTTPStatus.CREATED)
+        
+#Clase que define el endpoint para trabajar con usuarios
+#Operaciones CRUD: Create, Read, Update, Delete
+#verbo GET - leer usuario
+#verbo DELETE - borrar usuario
+class User(Resource):
+    
+    #verbo GET - leer usuario
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def get(self, username):
+        authServer.app.logger.info(helpers.log_request_id() + "User '" + username + "' information requested.")
+        
+        existingUser = authServer.db.users.find_one({"username": username})
+        if (existingUser is not None):
+            UserResponseGet = {
+                "id": str(existingUser["_id"]),
+                "username": existingUser["username"],
+                "first_name": existingUser["first_name"],
+                "last_name": existingUser["last_name"],
+                "contact": existingUser["contact"],
+                "avatar": existingUser["avatar"],
+                "login_service": existingUser["login_service"],
+                "account_closed": existingUser["account_closed"],
+                "date_created": existingUser["date_created"],
+                "date_updated": existingUser["date_updated"]
+            }
+            return helpers.return_request(UserResponseGet, HTTPStatus.OK)
+                
+        UserResponseGet = {
+            "code": -1,
+            "message": "User '" + username + "' not found.",
+            "data": None
+        }
+        return helpers.return_request(UserResponseGet, HTTPStatus.NOT_FOUND)
+
+    #verbo DELETE - borrar usuario
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def delete(self, username):
+        authServer.app.logger.info(helpers.log_request_id() + "User '" + username + "' close account requested.")
+ 
+        existingUser = authServer.db.users.find_one({"username": username})
+        if (existingUser is not None):
+            if (existingUser["account_closed"] == False):
+                
+                authServer.db.users.update_one({"username": username}, {'$set': {'account_closed': True, 'date_updated': datetime.utcnow().isoformat()}})
+                authServer.db.sessions.delete_many({"username": username})
+                authServer.db.recovery.delete_many({"username": username})
+
+                UserResponseDelete = {
+                    "code": 0,
+                    "message": "User '" + username + "' marked as closed account.",
+                    "data": None
+                }
+                return helpers.return_request(UserResponseDelete, HTTPStatus.OK)
+            
+            UserResponseDelete = {
+                "code": -1,
+                "message": "User '" + username + "' account is already closed.",
+                "data": None
+            }
+            return helpers.return_request(UserResponseDelete, HTTPStatus.BAD_REQUEST)
+         
+        UserResponseDelete = {
+            "code": -1,
+            "message": "User '" + username + "' not found.",
+            "data": None
+        }
+        return helpers.return_request(UserResponseDelete, HTTPStatus.NOT_FOUND)

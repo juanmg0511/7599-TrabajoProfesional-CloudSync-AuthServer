@@ -76,6 +76,8 @@ def on_starting(server):
 api.add_resource(home.Home, "/")
 api.add_resource(home.Ping, "/ping")
 api.add_resource(users.AllUsers, api_path + "/users")
+api.add_resource(users.User, api_path + "/users/<string:username>")
+
 
 # Inicio del server en forma directa con WSGI - toma el puerto y modo de las variables de entorno
 # PORT
