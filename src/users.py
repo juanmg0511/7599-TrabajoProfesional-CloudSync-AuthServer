@@ -191,6 +191,8 @@ class AllUsers(Resource):
 #Clase que define el endpoint para trabajar con usuarios
 #Operaciones CRUD: Create, Read, Update, Delete
 #verbo GET - leer usuario
+#verbo PUT - actualizar usuario completo (sin contrasenia)
+#verbo PATCH - actualizar contrasenia. solo permite op=replace y path=password
 #verbo DELETE - borrar usuario
 class User(Resource):
     
@@ -221,8 +223,167 @@ class User(Resource):
             "message": "User '" + username + "' not found.",
             "data": None
         }
-        return helpers.return_request(UserResponseGet, HTTPStatus.NOT_FOUND)
+        return helpers.return_request(UserResponseGet, HTTPStatus.NOT_FOUND)    
+                
+    #verbo PUT - actualizar usuario completo, si no existe lo crea
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def put(self, username):
+        authServer.app.logger.info(helpers.log_request_id() + "User '" + username + "' update requested.")
+        
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("first_name", type=helpers.non_empty_string, required=True, nullable=False)
+            parser.add_argument("last_name", type=helpers.non_empty_string, required=True, nullable=False)
+            parser.add_argument("contact", type=dict, required=True, nullable=False)
+            parser.add_argument("avatar", type=dict, required=False, nullable=True)
+            args = parser.parse_args()
+        except:
+            UserResponsePost = {
+                "code": -1,
+                "message": "Bad request. Missing required arguments.",
+                "data": None
+            }
+            return helpers.return_request(UserResponsePost, HTTPStatus.BAD_REQUEST)        
+        
+        #Validacion requeridos en contact
+        try:
+            email = helpers.non_empty_email(args["contact"].get("email", ""))
+            phone = helpers.non_empty_string(args["contact"].get("phone", ""))  
+        except:
+            UserResponsePost = {
+                "code": -2,
+                "message": "Bad request. Wrong format for 'contact'.",
+                "data": None
+            }            
+            return helpers.return_request(UserResponsePost, HTTPStatus.BAD_REQUEST) 
 
+        #Validacion de avatar
+        if (isinstance(args["avatar"], dict)):
+            try:
+                url = helpers.non_empty_avatar(args["avatar"].get("url", ""))  
+            except:
+                UserResponsePost = {
+                    "code": -3,
+                    "message": "Bad request. Wrong format for 'avatar'.",
+                    "data": None
+                }
+                return helpers.return_request(UserResponsePost, HTTPStatus.BAD_REQUEST)
+        else:
+            url = None
+
+        existingUser = authServer.db.users.find_one({"username": username})
+        if (existingUser is not None):
+            if (existingUser["account_closed"] == False):
+
+                userToUpdate = {
+                    "first_name": args["first_name"],
+                    "last_name": args["last_name"],
+                    "contact": {
+                        "email": email,
+                        "phone": phone
+                    },
+                    "avatar": { "url": url },
+                    "login_service": existingUser["login_service"],
+                    "account_closed": existingUser["account_closed"],
+                    "date_created": existingUser["date_created"],
+                    "date_updated": datetime.utcnow().isoformat()
+                }
+            
+                UserResponsePut = userToUpdate.copy()            
+                authServer.db.users.update_one({"username": username}, {'$set': userToUpdate})
+                id_userToUpdate = str(existingUser["_id"])
+                UserResponsePut["username"] = existingUser["username"]
+                UserResponsePut["id"] = id_userToUpdate
+            
+                return helpers.return_request(UserResponsePut, HTTPStatus.OK)
+            
+            UserResponsePut = {
+                "code": -4,
+                "message": "User '" + username + "' account is closed.",
+                "data:": None
+            }            
+            return helpers.return_request(UserResponsePut, HTTPStatus.BAD_REQUEST)   
+
+        UserResponsePut = {
+            "code": -1,
+            "message": "User '" + username + "' not found.",
+            "data": None
+        }        
+        return helpers.return_request(UserResponsePut, HTTPStatus.NOT_FOUND)    
+
+    #verbo PATCH - actualizar contrasenia. solo permite op=replace y path=password/path=avatar/url
+    #{ "op": "replace", "path": "/password", "value": "" }
+    #{ "op": "replace", "path": "/avatar/url", "value": "" }
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def patch(self, username):
+        authServer.app.logger.info(helpers.log_request_id() + "Password modification for user '" + username + "' requested.")
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("op", type=helpers.non_empty_string, required=True, nullable=False, choices=['replace'])
+            parser.add_argument("path", type=helpers.non_empty_string, required=True , nullable=False, choices=['/password','/avatar/url'])
+            parser.add_argument("value", type=helpers.non_empty_string, required=True, nullable=False)
+            args = parser.parse_args()
+        except:
+            UserResponsePatch = {
+                "code": -1,
+                "message": "Bad request. Wrong arguments, please see API documentation.",
+                "data": None
+            }
+            return helpers.return_request(UserResponsePatch, HTTPStatus.BAD_REQUEST)
+        
+        if (args["path"] == "/avatar/url"):
+            try:
+                url = helpers.non_empty_avatar(args.get("value", ""))  
+            except:
+                UserResponsePatch = {
+                    "code": -2,
+                    "message": "Bad request. Wrong format for 'value'.",
+                    "data": None
+                }
+                return helpers.return_request(UserResponsePatch, HTTPStatus.BAD_REQUEST)
+
+        existingUser = authServer.db.users.find_one({"username": username})
+        if (existingUser is not None):
+            if (existingUser["account_closed"] == False):
+            
+                if (args["path"] == '/password'):
+                    if (existingUser["login_service"] == False):
+                        existingUser["password"] = custom_app_context.hash(args["value"])
+                    else:
+                        userResponsePatch = {
+                            "code": -4,
+                            "message": "User '" + username + "' uses a login service, can't change password.",
+                            "data:": None
+                        }
+                        return helpers.return_request(userResponsePatch, HTTPStatus.BAD_REQUEST)
+                else:
+                    existingUser["avatar"]["url"] = url            
+                existingUser["date_updated"] = datetime.utcnow().isoformat()            
+                authServer.db.users.update_one({"username": username}, {'$set': existingUser})
+
+                userResponsePatch = {
+                    "code": 0,
+                    "message": "User '" + username + "' path '" + args["path"] + "' updated.",
+                    "data:": None
+                }
+                return helpers.return_request(userResponsePatch, HTTPStatus.OK)
+
+            userResponsePatch = {
+                "code": -3,
+                "message": "User '" + username + "' account is closed.",
+                "data:": None
+            }
+            return helpers.return_request(userResponsePatch, HTTPStatus.BAD_REQUEST)                                    
+
+        userResponsePatch = {
+            "code": -1,
+            "message": "User '" + username + "' not found.",
+            "data": None
+        }
+        return helpers.return_request(userResponsePatch, HTTPStatus.NOT_FOUND)    
+        
     #verbo DELETE - borrar usuario
     @helpers.require_apikey
     @helpers.log_reqId
