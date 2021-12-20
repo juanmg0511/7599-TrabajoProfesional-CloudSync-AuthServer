@@ -23,7 +23,7 @@ from functools import wraps
 from flask_pymongo import PyMongo
 
 #Importacion de clases necesarias
-from src import home, adminusers, users, helpers
+from src import home, adminusers, users, sessions, helpers
 
 #Version de API y Server
 api_version = "1"
@@ -35,6 +35,8 @@ app_debug_default = True
 app_port_default = 8000
 #Para todos los modos
 api_key_default = "44dd22ca-836d-40b6-aa49-7981ded03667"
+session_length_minutes_default_user = 60
+session_length_minutes_default_admin = 30
 
 #Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
@@ -56,6 +58,9 @@ CORS(app)
 
 #Lectura de la API KEY
 api_key = os.environ.get("APP_SERVER_API_KEY", api_key_default)
+#Lectura de longitud de sesion
+session_length_user = os.environ.get("SESSION_LENGTH_USER_MINUTES", session_length_minutes_default_user)
+session_length_admin = os.environ.get("SESSION_LENGTH_ADMIN_MINUTES", session_length_minutes_default_admin)
 
 #Inicializacion - para cuando ejecuta gunicorn + flask
 #Server hook "on_starting", ejecuta 1 sola vez antes de forkear los workers
@@ -80,6 +85,8 @@ api.add_resource(adminusers.AllAdminUsers, api_path + "/adminusers")
 api.add_resource(adminusers.AdminUser, api_path + "/adminusers/<string:username>")
 api.add_resource(users.AllUsers, api_path + "/users")
 api.add_resource(users.User, api_path + "/users/<string:username>")
+api.add_resource(sessions.AllSessions, api_path + "/sessions")      
+api.add_resource(sessions.Session, api_path + "/sessions/<string:token>")
 
 # Inicio del server en forma directa con WSGI - toma el puerto y modo de las variables de entorno
 # PORT

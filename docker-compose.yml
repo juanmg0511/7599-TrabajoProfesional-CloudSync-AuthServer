@@ -19,6 +19,10 @@ services:
       APP_PORT: 8000
       #Setear la API KEY para el app server
       APP_SERVER_API_KEY: "ef00a570-7cfc-4638-8cad-d085fd98b6e3"
+      #Setear la duracion de la sesion de usuarios, en minutos
+      SESSION_LENGTH_USER_MINUTES: 120
+      #Setear la duracion de la sesion de admins, en minutos
+      SESSION_LENGTH_ADMIN_MINUTES: 10
       #Datos para conectare a la DB
       MONGODB_DATABASE: auth-server-db
       MONGODB_USERNAME: authserveruser
