@@ -45,3 +45,24 @@ class Ping(Resource):
             "data": None
         }
         return helpers.return_request(pingResponseGet, HTTPStatus.OK)
+
+#Clase que entrega informacion sobre el estado del servidor
+class Status(Resource):
+    @helpers.log_reqId
+    def get(self):
+        authServer.app.logger.info(helpers.log_request_id() + 'Server status requested.')        
+        dbStatus = "offline"
+        try:
+            dbInfo = authServer.cl.server_info()
+            dbStatus = "online"
+        except:
+            dbStatus = "offline"        
+        statusResponseGet = {
+            "code": 0,
+            "message": "7599-cloudsync-auth-server-v" + authServer.server_version,
+            "data": {
+                        "server_status": "online",
+                        "database_status": dbStatus           
+                     }
+        }
+        return helpers.return_request(statusResponseGet, HTTPStatus.OK)

@@ -75,6 +75,7 @@ def on_starting(server):
 #Defincion de los endpoints del server
 api.add_resource(home.Home, "/")
 api.add_resource(home.Ping, "/ping")
+api.add_resource(home.Status, "/status")
 api.add_resource(adminusers.AllAdminUsers, api_path + "/adminusers")      
 api.add_resource(adminusers.AdminUser, api_path + "/adminusers/<string:username>")
 api.add_resource(users.AllUsers, api_path + "/users")
