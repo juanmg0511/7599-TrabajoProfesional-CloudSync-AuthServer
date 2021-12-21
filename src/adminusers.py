@@ -298,3 +298,45 @@ class AdminUser(Resource):
             "data": None
         }
         return helpers.return_request(UserResponseDelete, HTTPStatus.NOT_FOUND)    
+
+#Clase que define el endpoint para obtener las sesiones de un usuario admin
+#verbo GET - obtener sesiones vigentes del usuario admin
+class AdminUserSessions(Resource):
+    
+    #verbo GET - obtener sesiones vigentes del usuario admin
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def get(self, username):
+        authServer.app.logger.info(helpers.log_request_id() + "Admin user '" + username + "' sessions requested.")
+        
+        existingUser = authServer.db.adminusers.find_one({"username": username})
+        if (existingUser is not None):
+            if (existingUser["account_closed"] == False):
+        
+                UserSessionsResponseGet = []
+                AllUserSessions = authServer.db.sessions.find({"username": username})                        
+                for existingSession in AllUserSessions:                    
+                    if (datetime.utcnow() < datetime.fromisoformat(existingSession["expires"])):                    
+                        retrievedSession = {
+                            "id": str(existingSession["_id"]),
+                            "username": existingSession["username"],
+                            "session_token": existingSession["session_token"],
+                            "expires":  existingSession["expires"],
+                            "date_created": existingSession["date_created"]
+                        }
+                        UserSessionsResponseGet.append(retrievedSession)            
+                return helpers.return_request(UserSessionsResponseGet, HTTPStatus.OK)
+            
+            UserSessionsGet = {
+                "code": -1,
+                "message": "Admin user '" + username + "' account is closed.",
+                "data:": None
+            }            
+            return helpers.return_request(UserSessionsGet, HTTPStatus.BAD_REQUEST)   
+
+        UserSessionsGet = {
+            "code": -1,
+            "message": "Admin user '" + username + "' not found.",
+            "data": None
+        }        
+        return helpers.return_request(UserSessionsGet, HTTPStatus.NOT_FOUND)
