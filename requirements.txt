@@ -27,7 +27,7 @@ httplib2
 idna
 itsdangerous
 Jinja2
-MarkupSaf
+MarkupSafe
 passlib
 protobuf
 pyasn1
