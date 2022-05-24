@@ -21,7 +21,7 @@ from flask_pymongo import PyMongo
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Importacion de clases necesarias
-from src import home, adminusers, users, sessions, helpers
+from src import home, adminusers, users, sessions, recovery, helpers
 
 # Version de API y Server
 api_version = "1"
@@ -31,11 +31,14 @@ server_version = "1.00"
 # Solo para ejecutar en forma directa!
 app_debug_default = True
 app_port_default = 8000
+
 # Para todos los modos
 api_key_default = "44dd22ca-836d-40b6-aa49-7981ded03667"
 session_length_minutes_default_user = 60
 session_length_minutes_default_admin = 30
+recovery_length_minutes_default = 2880
 prune_interval_sessions_seconds_default = 3600
+prune_interval_recovery_seconds_default = 86400
 
 # Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
@@ -46,6 +49,7 @@ api = Api(app)
 
 # Inicializacion del parser de request ID
 RequestID(app)
+
 # Inicializacion de la base de datos, MongoDB
 app.config["MONGO_URI"] = "mongodb://" + \
                           os.environ.get("MONGODB_USERNAME",
@@ -77,10 +81,17 @@ session_length_user = os.environ.get("SESSION_LENGTH_USER_MINUTES",
                                      session_length_minutes_default_user)
 session_length_admin = os.environ.get("SESSION_LENGTH_ADMIN_MINUTES",
                                       session_length_minutes_default_admin)
+# Lectura de longitud de recovery
+recovery_length = os.environ.get("RECOVERY_LENGTH_MINUTES",
+                                 recovery_length_minutes_default)
 # Lectura del intervalo de limpieza de sessions, en segundos
 prune_interval_sessions = \
                         os.environ.get("PRUNE_INTERVAL_SESSIONS_SECONDS",
                                        prune_interval_sessions_seconds_default)
+# Lectura del intervalo de limpieza de recovery, en segundos
+prune_interval_recovery = \
+                        os.environ.get("PRUNE_INTERVAL_RECOVERY_SECONDS",
+                                       prune_interval_recovery_seconds_default)
 
 
 # Inicializacion - para cuando ejecuta gunicorn + flask
@@ -116,6 +127,17 @@ def on_starting(server):
                       id="auth_server_prune_sessions",
                       replace_existing=True)
 
+    # Limpia la tabla de recoveries vencidas
+    # Frecuencia PRUNE_INTERVAL_RECOVERY_SECONDS
+    app.logger.debug("Configuring recovery prune job, interval " +
+                     str(prune_interval_recovery) + " seconds.")
+    scheduler.add_job(func=helpers.prune_recovery,
+                      coalesce=True, max_instances=1,
+                      trigger="interval",
+                      seconds=int(prune_interval_recovery),
+                      id="auth_server_prune_recovery",
+                      replace_existing=True)
+
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
@@ -143,6 +165,11 @@ api.add_resource(sessions.AllSessions,
                  api_path + "/sessions")
 api.add_resource(sessions.Session,
                  api_path + "/sessions/<string:token>")
+api.add_resource(recovery.AllRecovery,
+                 api_path + "/recovery")
+api.add_resource(recovery.Recovery,
+                 api_path + "/recovery/<string:username>")
+
 
 # Inicio del server en forma directa con WSGI
 # Toma el puerto y modo de las variables de entorno

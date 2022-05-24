@@ -92,6 +92,47 @@ def prune_sessions():
     authServer.app.logger.debug('Prune expired sessions:' +
                                 ' task data successfully logged to DB.')
 
+    return 0
+
+
+# Funcion que limpia la collection de recovery vencidas
+def prune_recovery():
+
+    authServer.app.logger.info("prune_recovery: starting...")
+    AllRecovery = authServer.db.recovery.find()
+    recoveryCount = authServer.db.recovery.count_documents({})
+    recoveryDeleted = 0
+    if (recoveryCount > 0):
+        authServer.app.logger.info("prune_recovery: " +
+                                   str(recoveryCount) +
+                                   " requests found.")
+        for existingRecovery in AllRecovery:
+            if (datetime.utcnow()
+               >
+               datetime.fromisoformat(existingRecovery["expires"])):
+                authServer.db.recovery.delete_one(existingRecovery)
+                recoveryDeleted += 1
+        authServer.app.logger.info("prune_recovery: deleted " +
+                                   str(recoveryDeleted) +
+                                   " expired requests.")
+    else:
+        authServer.app.logger.info("prune_recovery: no requests found.")
+    authServer.app.logger.info("prune_recovery: done.")
+
+    # Armamos el documento a guardar en la base de datos
+    pruneLog = {
+        "log_type": "task",
+        "request_date": datetime.utcnow().isoformat(),
+        "task_type": "prune expired recovery requests",
+        "api_version": "v" + authServer.api_version,
+        "pruned_requests": recoveryDeleted
+    }
+    authServer.db.requestlog.insert_one(pruneLog)
+    authServer.app.logger.debug('Prune expired recovery requests: ' +
+                                'task data successfully logged to DB.')
+
+    return 0
+
 
 # Funcion que devuelve los return de los requests
 def return_request(message, status):

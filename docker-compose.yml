@@ -8,22 +8,29 @@ services:
     container_name: auth-server-flask
     restart: unless-stopped
     environment:
-      #GUNICORN_LOG_LEVEL - The granularity of log output
-      #A string of "debug", "info", "warning", "error", "critical"
+      # GUNICORN_LOG_LEVEL - The granularity of log output
+      # A string of "debug", "info", "warning", "error", "critical"
       GUNICORN_LOG_LEVEL: "debug"
-      #Setear la cantidad de workers a utilizar por Gunicorn
-      #https://devcenter.heroku.com/articles/python-gunicorn
+      # Setear la cantidad de workers a utilizar por Gunicorn
+      # https://devcenter.heroku.com/articles/python-gunicorn
       GUNICORN_WORKERS: 4
-      #Setear en True or False, solo aplica para correr desde Python (o sea nunca)
+      # Setear en True or False, solo aplica para correr desde Python (o sea nunca)
       APP_DEBUG: "True"
       APP_PORT: 8000
-      #Setear la API KEY para el app server
+      # Setear la API KEY para el app server
       APP_SERVER_API_KEY: "ef00a570-7cfc-4638-8cad-d085fd98b6e3"
-      #Setear la duracion de la sesion de usuarios, en minutos
+      # Setear la duracion de la sesion de usuarios, en minutos
       SESSION_LENGTH_USER_MINUTES: 120
-      #Setear la duracion de la sesion de admins, en minutos
+      # Setear la duracion de la sesion de admins, en minutos
       SESSION_LENGTH_ADMIN_MINUTES: 10
-      #Datos para conectare a la DB
+      # Setear la duracion de los token de recuperacion de password, en minutos
+      RECOVERY_LENGTH_MINUTES: 7200
+      # Setear el intervalo de limpieza de sessions, en segundos
+      PRUNE_INTERVAL_SESSIONS_SECONDS: 60
+      # Setear el intervalo de limpieza de recovery, en segundos
+      PRUNE_INTERVAL_RECOVERY_SECONDS: 120
+
+      # Datos para conectare a la DB
       MONGODB_DATABASE: auth-server-db
       MONGODB_USERNAME: authserveruser
       MONGODB_PASSWORD: 123456
@@ -55,12 +62,12 @@ services:
       MONDODB_LOG_DIR: /dev/null
     volumes:
       - mongodbdata:/data/db
-      #Si el volumen de arriba no existe, corremos el script mongoinit.sh para agregar el usuario
-      #de aplicacion e inicializar la base de datos
+      # Si el volumen de arriba no existe, corremos el script mongoinit.sh para agregar el usuario
+      # de aplicacion e inicializar la base de datos
       - "./mongoinit/:/docker-entrypoint-initdb.d/"
-    #Exponemos el puerto para administrar la DB directamente, durante el desarrollo
-    #ports:
-       #- "27017:27017"
+    # Exponemos el puerto para administrar la DB directamente, durante el desarrollo
+    # ports:
+       # - "27017:27017"
     networks:
       - backend
 
