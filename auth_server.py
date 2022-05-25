@@ -1,5 +1,6 @@
-# Cloudsync - Auth Server
+# CloudSync - Auth Server
 # Flask + MongoDB - on Gunicorn
+# auth_server.py
 
 # Basado en:
 # https://codeburst.io/this-is-how-easy-it-is-to-create-a-rest-api-8a25122ab1f3
@@ -15,6 +16,8 @@ from flask import Flask
 from flask_restful import Api
 from flask_log_request_id import RequestID
 from flask_cors import CORS
+# Flask-sendmail para el envio de correo
+from flask_mail import Mail
 # PyMongo para el manejo de MongoDB
 from flask_pymongo import PyMongo
 # Flask-APScheduler para el prune de la collection de sesiones
@@ -34,12 +37,22 @@ app_debug_default = True
 app_port_default = 8000
 
 # Para todos los modos
+app_env_default = "DEV"
 api_key_default = "44dd22ca-836d-40b6-aa49-7981ded03667"
 session_length_minutes_default_user = 60
 session_length_minutes_default_admin = 30
 recovery_length_minutes_default = 2880
 prune_interval_sessions_seconds_default = 3600
 prune_interval_recovery_seconds_default = 86400
+sendmail_active_default = "0"
+sendmail_server_default = "in-v3.mailjet.com"
+sendmail_from_default = None
+sendmail_port_default = 465
+sendmail_username_default = None
+sendmail_password_default = None
+sendmail_tls_default = "0"
+sendmail_ssl_default = "1"
+sendmail_base_url_default = "http://127.0.0.1"
 
 # Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
@@ -47,6 +60,35 @@ api_path = "/api/v" + api_version
 # Inicializacion de la api
 app = Flask(__name__)
 api = Api(app)
+# Inicializacion del sistema de correo
+mail_active = os.environ.get("SENDMAIL_ACTIVE",
+                             sendmail_active_default)
+app.config["MAIL_SERVER"] = os.environ.get("SENDMAIL_SERVER",
+                                           sendmail_server_default)
+app.config["MAIL_PORT"] = os.environ.get("SENDMAIL_PORT",
+                                         sendmail_port_default)
+app.config["MAIL_USERNAME"] = os.environ.get("SENDMAIL_USERNAME",
+                                             sendmail_username_default)
+app.config["MAIL_PASSWORD"] = os.environ.get("SENDMAIL_PASSWORD",
+                                             sendmail_password_default)
+if (os.environ.get("SENDMAIL_ACTIVE", sendmail_tls_default) == "1"):
+    mail_active = True
+else:
+    mail_active = False
+if (os.environ.get("SENDMAIL_USE_TLS", sendmail_tls_default) == "1"):
+    app.config["MAIL_USE_TLS"] = True
+else:
+    app.config["MAIL_USE_TLS"] = False
+if (os.environ.get("SENDMAIL_USE_SSL", sendmail_ssl_default) == "1"):
+    app.config["MAIL_USE_SSL"] = True
+else:
+    app.config["MAIL_USE_SSL"] = False
+mail_from = os.environ.get("SENDMAIL_FROM", sendmail_from_default)
+mail_base_url = os.environ.get("SENDMAIL_BASE_URL", sendmail_from_default)
+# Lectura del template para los mails de recovery
+with open("templates/mailTemplate.html", "r") as mail_template_fp:
+    mail_template = str(mail_template_fp.read())
+mail = Mail(app)
 
 # Inicializacion del parser de request ID
 RequestID(app)
@@ -75,6 +117,8 @@ cl = mongo.cx
 # Habilitacion de CORS
 CORS(app)
 
+# Lectura de la configuración de ambiente
+app_env = os.environ.get("APP_ENV", app_env_default)
 # Lectura de la API KEY
 api_key = os.environ.get("APP_SERVER_API_KEY", api_key_default)
 # Lectura de longitud de sesion

@@ -17,6 +17,9 @@ services:
       # Setear en True or False, solo aplica para correr desde Python (o sea nunca)
       APP_DEBUG: "True"
       APP_PORT: 8000
+      # Setear el entorno en que corre el server
+      # Puede ser "DEV", "QA", "PROD"
+      APP_ENV: "DEV"
       # Setear la API KEY para el app server
       APP_SERVER_API_KEY: "ef00a570-7cfc-4638-8cad-d085fd98b6e3"
       # Setear la duracion de la sesion de usuarios, en minutos
@@ -29,7 +32,16 @@ services:
       PRUNE_INTERVAL_SESSIONS_SECONDS: 60
       # Setear el intervalo de limpieza de recovery, en segundos
       PRUNE_INTERVAL_RECOVERY_SECONDS: 120
-
+      # Configuracion de correo
+      SENDMAIL_ACTIVE: "0"
+      SENDMAIL_SERVER: "in-v3.mailjet.com"
+      SENDMAIL_FROM: "*"
+      SENDMAIL_PORT: 465
+      SENDMAIL_USERNAME: "*"
+      SENDMAIL_PASSWORD: "*"
+      SENDMAIL_USE_TLS: "0"
+      SENDMAIL_USE_SSL: "1"
+      SENDMAIL_BASE_URL: "http://127.0.0.1"
       # Datos para conectare a la DB
       MONGODB_DATABASE: auth-server-db
       MONGODB_USERNAME: authserveruser

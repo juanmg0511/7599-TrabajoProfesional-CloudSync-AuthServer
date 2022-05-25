@@ -1,5 +1,6 @@
 # CloudSync - Auth Server
 # Flask + MongoDB - on Gunicorn
+# src/helpers.py
 
 # Basado en:
 # https://codeburst.io/this-is-how-easy-it-is-to-create-a-rest-api-8a25122ab1f3
@@ -14,6 +15,8 @@ from datetime import datetime, timedelta
 from flask import request
 from flask_log_request_id import current_request_id
 from http import HTTPStatus
+# Flask-sendmail para el envio de correo
+from flask_mail import Message
 # Wraps, para implementacion de decorators
 from functools import wraps
 
@@ -193,6 +196,74 @@ def non_empty_avatar(a):
        is None):
         raise ValueError("Must be valid URL.")
     return a
+
+
+# Funcion que envia el correo de recupero de contraseña
+def send_recovery_notification(user, recovery_key):
+
+    authServer.app.logger.info(log_request_id() +
+                               "Sending mail to user: \"" +
+                               str(user["username"]) +
+                               "\" at \"" +
+                               str(user["contact"]["email"]) + "\".")
+
+    if (authServer.mail_active is False):
+        authServer.app.logger.warning(log_request_id() +
+                                      "Send mail functionality is " +
+                                      "DISABLED. Please enable " +
+                                      "\"SENDMAIL_ACTIVE\".")
+        authServer.app.logger.warning(log_request_id() +
+                                      "Mail not sent.")
+        return -1
+
+    if authServer.app_env == "QA":
+        subject = "CloudSync [Quality Assurance]"
+    elif authServer.app_env == "PROD":
+        subject = "CloudSync"
+    else:
+        subject = "CloudSync [Development]"
+    msg = Message(subject + ": password recovery request",
+                  sender=("CloudSync Admin", authServer.mail_from),
+                  reply_to="no-reply@cloudsync.com",
+                  recipients=[str(user["contact"]["email"])])
+
+    msg.html = authServer.\
+        mail_template.\
+        replace("wwww://wwwww-wwwwww-w-www-wwwww.wwwwwwwww.www",
+                authServer.mail_base_url).\
+        replace("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                recovery_key).\
+        replace("yyyy-yyyy-yyyy",
+                user["username"])
+    message = "Mail dispatched successfully."
+    exception = None
+    try:
+        with authServer.app.app_context():
+            authServer.mail.send(msg)
+        authServer.app.logger.info(log_request_id() + message)
+    except Exception as e:
+        message = "Error sending mail."
+        exception = str(e)
+        authServer.app.logger.error(log_request_id() + message)
+        authServer.app.logger.error(log_request_id() + "Message: " + exception)
+    finally:
+        # Armamos el documento a guardar en la base de datos
+        mailLog = {
+            "log_type": "mail",
+            "request_date": datetime.utcnow().isoformat(),
+            "request_id": current_request_id(),
+            "api_version": "v" + authServer.api_version,
+            "username": user["username"],
+            "email": str(user["contact"]["email"]),
+            "recovery_key": recovery_key,
+            "mail_status": message,
+            "exception_message": exception
+        }
+        authServer.db.requestlog.insert_one(mailLog)
+        authServer.app.logger.debug(log_request_id() +
+                                    'Mail data successfully logged to DB.')
+
+    return 0
 
 
 # Funcion que calcula las estadisticas de uso del servidor

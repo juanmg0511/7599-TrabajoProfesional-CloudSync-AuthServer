@@ -1,5 +1,6 @@
-# Cloudsync - Auth Server
+# CloudSync - Auth Server
 # Flask + MongoDB - on Gunicorn
+# src/recovery.py
 
 # Basado en:
 # https://codeburst.io/this-is-how-easy-it-is-to-create-a-rest-api-8a25122ab1f3
@@ -97,8 +98,9 @@ class AllRecovery(Resource):
                     id_recoveryToInsert = str(recoveryToInsert["_id"])
                     RecoveryResponsePost["id"] = id_recoveryToInsert
 
-                    # ToDo: send the recovery email!
-
+                    helpers.send_recovery_notification(
+                        user=existingUser,
+                        recovery_key=RecoveryResponsePost["recovery_key"])
                     return helpers.return_request(RecoveryResponsePost,
                                                   HTTPStatus.CREATED)
 
