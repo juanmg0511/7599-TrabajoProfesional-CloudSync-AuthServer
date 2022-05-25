@@ -21,7 +21,8 @@ from flask_pymongo import PyMongo
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Importacion de clases necesarias
-from src import home, adminusers, users, sessions, recovery, helpers
+from src import home, adminusers, users, sessions, recovery, \
+                requestlog, helpers
 
 # Version de API y Server
 api_version = "1"
@@ -142,6 +143,25 @@ def on_starting(server):
     atexit.register(lambda: scheduler.shutdown())
 
 
+# Request log, inicializacion de los decorators
+# Llamada antes de cada request
+@app.before_request
+def before_request():
+    app.logger.debug(helpers.log_request_id() +
+                     'Excecuting before request actions.')
+    requestlog.start_timer()
+
+
+# Llamada luego de cada request
+@app.after_request
+def after_request(response):
+    app.logger.debug(helpers.log_request_id() +
+                     'Excecuting after request actions.')
+    requestlog.log_request(response)
+
+    return response
+
+
 # Defincion de los endpoints del server
 api.add_resource(home.Home,
                  "/")
@@ -169,6 +189,8 @@ api.add_resource(recovery.AllRecovery,
                  api_path + "/recovery")
 api.add_resource(recovery.Recovery,
                  api_path + "/recovery/<string:username>")
+api.add_resource(requestlog.RequestLog,
+                 api_path + "/requestlog")
 
 
 # Inicio del server en forma directa con WSGI
