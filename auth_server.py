@@ -167,6 +167,8 @@ api.add_resource(home.Home,
                  "/")
 api.add_resource(home.Ping,
                  "/ping")
+api.add_resource(home.Stats,
+                 "/stats")
 api.add_resource(home.Status,
                  "/status")
 api.add_resource(adminusers.AllAdminUsers,
