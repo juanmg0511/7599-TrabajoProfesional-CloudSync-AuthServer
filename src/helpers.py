@@ -61,6 +61,53 @@ def log_reqId(view_function):
     return check_and_log_req_id
 
 
+# Funcion que loguea los parametros configurados en variables de entorno
+def config_log():
+
+    if (authServer.api_key == authServer.api_key_default):
+        authServer.app.logger.warning("API key not set, please verify " +
+                                      "\"APP_SERVER_API_KEY\". Using " +
+                                      "default value.")
+    authServer.app.logger.debug("API key is: \"" +
+                                str(authServer.api_key) +
+                                "\".")
+    authServer.app.logger.info("Session length for users is: " +
+                               str(authServer.session_length_user) +
+                               " minutes.")
+    authServer.app.logger.info("Session length for admins is: " +
+                               str(authServer.session_length_admin) +
+                               " minutes.")
+    authServer.app.logger.info("Recovery length is: " +
+                               str(authServer.recovery_length) +
+                               " minutes.")
+    authServer.app.logger.info("Prune interval for sessions is: " +
+                               str(authServer.prune_interval_sessions) +
+                               " seconds.")
+    authServer.app.logger.info("Prune interval for recovery is: " +
+                               str(authServer.prune_interval_recovery) +
+                               " seconds.")
+    if (authServer.mail_active is False):
+        authServer.app.logger.warning("Send mail functionality is DISABLED. " +
+                                      "Please enable \"SENDMAIL_ACTIVE\".")
+    authServer.app.logger.info("Mail server: \"" +
+                               str(authServer.app.config["MAIL_SERVER"]) +
+                               "\".")
+    authServer.app.logger.info("Port: " +
+                               str(authServer.app.config["MAIL_PORT"]) +
+                               ".")
+    authServer.app.logger.info("Use TLS: " +
+                               str(authServer.app.config["MAIL_USE_TLS"]) +
+                               ".")
+    authServer.app.logger.info("Use SSL: " +
+                               str(authServer.app.config["MAIL_USE_SSL"]) +
+                               ".")
+    authServer.app.logger.info("Recovery base URL: \"" +
+                               str(authServer.mail_base_url) +
+                               "\".")
+
+    return 0
+
+
 # Funcion que limpia la collection de sesiones vencidas
 def prune_sessions():
     authServer.app.logger.info("prune_sessions: starting...")

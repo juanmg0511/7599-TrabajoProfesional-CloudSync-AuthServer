@@ -154,6 +154,9 @@ def on_starting(server):
     app.logger.setLevel(gunicorn_logger.level)
     app.logger.debug("Log system configured for Gunicorn.")
 
+    # Logueo de los valores configurados mediante variables de entorno
+    helpers.config_log()
+
     # Inicializacion del scheduler utilizado para limpiar las collections
     # de tokens vencidos
     app.logger.debug("Configuring BackgroundScheduler for Gunicorn.")
@@ -253,4 +256,5 @@ if __name__ == '__main__':
     ENVIRONMENT_PORT = os.environ.get("APP_PORT", os.environ.get("PORT",
                                       app_port_default))
     # Logueo de los valores configurados mediante variables de entorno
+    helpers.config_log()
     app.run(host='0.0.0.0', port=ENVIRONMENT_PORT, debug=ENVIRONMENT_DEBUG)
