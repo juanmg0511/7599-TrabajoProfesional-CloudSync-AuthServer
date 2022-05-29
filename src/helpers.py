@@ -115,6 +115,15 @@ def config_log():
     authServer.app.logger.info("Recovery base URL: \"" +
                                str(authServer.mail_base_url) +
                                "\".")
+    if (authServer.google_client_id is None):
+        authServer.app.logger.warning("Google login incorrectly " +
+                                      "configured. " +
+                                      "Please check settings!")
+    else:
+        authServer.app.logger.info("Google login configured.")
+        authServer.app.logger.info("Client ID: \"" +
+                                   authServer.google_client_id +
+                                   "\".")
     authServer.app.logger.debug("Max avatar width is: \"" +
                                 str(authServer.avatar_max_width) +
                                 "\" pixels.")

@@ -56,6 +56,7 @@ sendmail_base_url_default = "http://127.0.0.1"
 avatar_max_width_default = 256
 avatar_max_height_default = 256
 avatar_max_size_default = 524288
+google_client_id_default = None
 
 # Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
@@ -92,6 +93,10 @@ mail_base_url = os.environ.get("SENDMAIL_BASE_URL", sendmail_from_default)
 with open("templates/mailTemplate.html", "r") as mail_template_fp:
     mail_template = str(mail_template_fp.read())
 mail = Mail(app)
+
+# Inicializacion de Google login
+google_client_id = os.environ.get("GOOGLE_CLIENT_ID",
+                                  google_client_id_default)
 
 # Inicializacion del parser de request ID
 RequestID(app)

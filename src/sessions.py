@@ -14,6 +14,9 @@ from datetime import datetime, timedelta
 from flask import request
 from flask_restful import Resource, reqparse
 from http import HTTPStatus
+# Google auth libraries for 'Sign in with Google'
+from google.oauth2 import id_token
+from google.auth.transport import requests
 # Passlib para encriptar contrasenias
 from passlib.apps import custom_app_context
 
@@ -100,19 +103,15 @@ class AllSessions(Resource):
 
         # Validamos el login del usuario
         if ((existingUser is not None) or (existingAdminUser is not None)):
-            is_password = False
             is_service = False
             valid_password = False
             valid_login = False
             try:
                 if (existingUser is not None):
                     if (existingUser["login_service"] is False):
-                        is_password = True
                         error_code = -3
                         # Debe proporcionar una password, y no debe estar vacia
-                        if (args["password"] is not None):
-                            password = args["password"]
-                        else:
+                        if (args["password"] is None):
                             raise ValueError("Password is required" +
                                              " without login service.")
                         # No debe proporcionar un token
@@ -145,10 +144,71 @@ class AllSessions(Resource):
                                                     args["username"] +
                                                     "' with external service.")
                         try:
+                            # Specify the CLIENT_ID of the app that accesses
+                            # the backend:
+                            idinfo = id_token.verify_oauth2_token(
+                                token, requests.Request(),
+                                authServer.google_client_id)
 
-                            # ToDo: Ver codigo para login with Google!
-                            # Crear proyecto en Firebase
-                            raise Exception("Not Implemented.")
+                            # Or, if multiple clients access the
+                            # backend server:
+                            # idinfo = id_token.verify_oauth2_token(
+                            #   token, requests.Request())
+                            # if idinfo['aud'] not in [CLIENT_ID_1,
+                            #                          CLIENT_ID_2,
+                            #                          CLIENT_ID_3]:
+                            #   raise ValueError('Could not verify audience.')
+
+                            if (idinfo['iss']
+                               not in
+                               ['accounts.google.com',
+                               'https://accounts.google.com']):
+                                raise ValueError('Wrong issuer.')
+
+                            # If auth request is from a G Suite domain:
+                            # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
+                            #     raise ValueError('Wrong hosted domain.')
+
+                            # ID token is valid. Get the user's Google Account
+                            # ID from the decoded token.
+                            userid = idinfo['sub']
+                            useremail = idinfo['email']
+                            # Esta autorizado por Google - chequeamos los datos
+                            # {
+                            #    # These six fields are included in all
+                            #    # Google ID Tokens.
+                            #    "iss": "https://accounts.google.com",
+                            #    "sub": "110169484474386276334",
+                            #    "azp": "1008719970978-hb24n2dstb40o45d4feu" +
+                            #           "o2ukqmcc6381.apps.googleusercontent.com",
+                            #    "aud": "1008719970978-hb24n2dstb40o45d4feu" +
+                            #           "o2ukqmcc6381.apps.googleusercontent.com",
+                            #    "iat": "1433978353",
+                            #    "exp": "1433981953",
+                            #
+                            #    These seven fields are only included when the
+                            #    user has granted the "profile" and
+                            #    "email" OAuth scopes to the application.
+                            #    "email": "testuser@gmail.com",
+                            #    "email_verified": "true",
+                            #    "name" : "Test User",
+                            #    "picture": "https://lh4.googleusercontent" +
+                            #               ".com/-kYgzyAWpZzJ/ABCDEFGHI/A" +
+                            #               "AAJKLMNOP/tIXL9Ir44LE/s99-c/p" +
+                            #               "hoto.jpg",
+                            #    "given_name": "Test",
+                            #    "family_name": "User",
+                            #    "locale": "en"
+                            # }
+                            # Para chequear el mail necesitamos
+                            # grantear el Profile
+                            if (useremail == existingUser["username"]):
+                                # Es el usuario
+                                authServer.app.logger.debug(
+                                    helpers.log_request_id() + "Authorized.")
+                                authServer.app.logger.debug(
+                                    helpers.log_request_id() + str(userid))
+                                valid_login = True
 
                         except Exception as loginServiceExcept:
                             # Invalid token
@@ -162,12 +222,9 @@ class AllSessions(Resource):
                                 str(loginServiceExcept))
                     closed = existingUser["account_closed"]
                 if (existingAdminUser is not None):
-                    is_password = True
                     error_code = -5
                     # Debe proporcionar una password, y no debe estar vacia
-                    if (args["password"] is not None):
-                        password = args["password"]
-                    else:
+                    if (args["password"] is None):
                         raise ValueError("Password is required" +
                                          " without login service.")
                     # No debe proporcionar un token
