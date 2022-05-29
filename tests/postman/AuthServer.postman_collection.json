@@ -1,0 +1,1076 @@
+{
+	"info": {
+		"_postman_id": "6f0aa9d6-4651-4e38-9dc1-f6a05a36763f",
+		"name": "AuthServer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21162579"
+	},
+	"item": [
+		{
+			"name": "Admin Users",
+			"item": [
+				{
+					"name": "List all Admin Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Admin User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers/cloudsyncgod",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers",
+								"cloudsyncgod"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List an Admin User's sessions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers/cloudsyncgod/sessions",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers",
+								"cloudsyncgod",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Admin User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin1\",\n    \"password\": \"123456\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"Numero Uno\",\n    \"email\": \"test12345@gmail.com\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Admin User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin1\",\n    \"password\": \"123456\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"Numero Dos\",\n    \"email\": \"test12345@gmail.com\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers/admin1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers",
+								"admin1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Admin User password",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"op\": \"replace\",\n    \"path\": \"/password\",\n    \"value\": \"123456\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers/admin1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers",
+								"admin1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Admin User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers/admin1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers",
+								"admin1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "Home",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:81",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ping",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:81/ping",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"ping"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:81/status",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:81/stats?startdate=2022-05-25&enddate=2022-05-29&sort_ascending=false",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "startdate",
+									"value": "2022-05-25"
+								},
+								{
+									"key": "enddate",
+									"value": "2022-05-29"
+								},
+								{
+									"key": "sort_ascending",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Password Recovery",
+			"item": [
+				{
+					"name": "List all password recovery requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/recovery",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"recovery"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Request for User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"juan0511\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/recovery",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"recovery"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List a user's password recovery requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/recovery/juan0511",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"recovery",
+								"juan0511"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset a user's password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"recovery_key\": \"c47c4ad0-dc8d-11ec-86fe-0242ac120003\",\n    \"new_password\": \"123456\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/recovery/juan0511",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"recovery",
+								"juan0511"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Request Log",
+			"item": [
+				{
+					"name": "View Request",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/requestlog?startdate=2022-05-25&enddate=2022-05-26&filter={\"comparator\": \"eq\",\"field\": \"request_id\",\"value\": \"89913d6f-c22b-4a61-93a7-9b88e97849b8\"}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"requestlog"
+							],
+							"query": [
+								{
+									"key": "startdate",
+									"value": "2022-05-25"
+								},
+								{
+									"key": "enddate",
+									"value": "2022-05-26"
+								},
+								{
+									"key": "filter",
+									"value": "{\"comparator\": \"eq\",\"field\": \"request_id\",\"value\": \"89913d6f-c22b-4a61-93a7-9b88e97849b8\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sessions",
+			"item": [
+				{
+					"name": "List all sessions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/sessions",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New session (login - user & password)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"juan0511\",\n    \"password\": \"123456\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/sessions",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New session (login - login service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"dmf17\",\n    \"login_service_token\": \"123456\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/sessions",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get session (check & renew)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/sessions/5dd3be50-df65-11ec-87e0-0242ac120003",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"5dd3be50-df65-11ec-87e0-0242ac120003"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete session (logout)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/sessions/5dd3be50-df65-11ec-87e0-0242ac120003",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"5dd3be50-df65-11ec-87e0-0242ac120003"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "List all Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users/juan0511",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"juan0511"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List a User's sessions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users/juan0511/sessions",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"juan0511",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New User (user & password)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"dmf16\",\n    \"password\": \"123456\",\n    \"first_name\": \"Damián\",\n    \"last_name\": \"Marquesín Fernandez\",\n    \"contact\": {\n        \"email\": \"dmforgan89@gmail.com\",\n        \"phone\": \"5555 5555\"\n    },\n    \"avatar\": {\n        \"isUrl\": true,\n        \"data\": \"http://www.google.com\"\n    },\n    \"login_service\": false \n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New User (login service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"dmf17\",\n    \"first_name\": \"Damián\",\n    \"last_name\": \"Marquesín Fernandez\",\n    \"contact\": {\n        \"email\": \"dmforgan89@gmail.com\",\n        \"phone\": \"5555 5555\"\n    },\n    \"avatar\": {\n        \"isUrl\": true,\n        \"data\": \"http://www.google.com\"\n    },\n    \"login_service\": true \n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Damián\",\n    \"last_name\": \"Marquesín Fernandez\",\n    \"contact\": {\n        \"email\": \"dmforgan89@gmail.com\",\n        \"phone\": \"5555 5555\"\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users/dmf15",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"dmf15"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User password",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"op\": \"replace\",\n    \"path\": \"/password\",\n    \"value\": \"123456\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users/juan0511",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"juan0511"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User avatar",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"op\": \"replace\",\n    \"path\": \"/avatar\",\n    \"value\": {\n        \"isUrl\": true,\n        \"data\": \"http://www.google.com\"\n\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users/juan0511",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"juan0511"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users/dmf5",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"dmf5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
