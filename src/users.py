@@ -335,6 +335,10 @@ class User(Resource):
             data = None
 
         existingUser = authServer.db.users.find_one({"username": username})
+        if (isUrl is None):
+            isUrl = existingUser["avatar"]["isUrl"]
+            data = existingUser["avatar"]["data"]
+
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
 
