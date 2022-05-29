@@ -59,7 +59,7 @@ services:
        - authserverlogs:/home/ubuntu/logs
        - ".:/home/ubuntu/" 
     ports:
-       - "80:8000"
+       - "81:8000"
     depends_on:
       - mongodb
     networks:
