@@ -510,8 +510,8 @@ class User(Resource):
                                "' marked as closed account.",
                     "data": None
                 }
-                return helpers.eturn_request(UserResponseDelete,
-                                             HTTPStatus.OK)
+                return helpers.return_request(UserResponseDelete,
+                                              HTTPStatus.OK)
 
             UserResponseDelete = {
                 "code": -1,
