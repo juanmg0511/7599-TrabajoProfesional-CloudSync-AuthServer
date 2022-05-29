@@ -124,7 +124,15 @@ class AllUsers(Resource):
         # Validacion de avatar
         if (isinstance(args["avatar"], dict)):
             try:
-                url = helpers.non_empty_avatar(args["avatar"].get("url", ""))
+                isUrl = helpers.\
+                        non_empty_bool(args["avatar"].get("isUrl", ""))
+                if (isUrl is True):
+                    data = helpers.\
+                           non_empty_url(args["avatar"].get("data", ""))
+                else:
+                    data = helpers.\
+                           non_empty_image(args["avatar"].get("data", ""))
+
             except Exception:
                 UserResponsePost = {
                     "code": -3,
@@ -134,7 +142,8 @@ class AllUsers(Resource):
                 return helpers.return_request(UserResponsePost,
                                               HTTPStatus.BAD_REQUEST)
         else:
-            url = None
+            isUrl = None
+            data = None
 
         # Validacion del tipo de usuario
         # Por default es false, para que el cambio sea transparente
@@ -202,7 +211,8 @@ class AllUsers(Resource):
                             "phone": phone
                         },
             "avatar": {
-                        "url": url
+                        "isUrl": isUrl,
+                        "data": data
                       },
             "account_closed": False,
             "login_service": login_service,
@@ -303,7 +313,15 @@ class User(Resource):
         # Validacion de avatar
         if (isinstance(args["avatar"], dict)):
             try:
-                url = helpers.non_empty_avatar(args["avatar"].get("url", ""))
+                isUrl = helpers.\
+                        non_empty_bool(args["avatar"].get("isUrl", ""))
+                if (isUrl is True):
+                    data = helpers.\
+                           non_empty_url(args["avatar"].get("data", ""))
+                else:
+                    data = helpers.\
+                           non_empty_image(args["avatar"].get("data", ""))
+
             except Exception:
                 UserResponsePost = {
                     "code": -3,
@@ -313,7 +331,8 @@ class User(Resource):
                 return helpers.return_request(UserResponsePost,
                                               HTTPStatus.BAD_REQUEST)
         else:
-            url = None
+            isUrl = None
+            data = None
 
         existingUser = authServer.db.users.find_one({"username": username})
         if (existingUser is not None):
@@ -327,8 +346,9 @@ class User(Resource):
                         "phone": phone
                     },
                     "avatar": {
-                                "url": url
-                              },
+                        "isUrl": isUrl,
+                        "data": data
+                      },
                     "login_service": existingUser["login_service"],
                     "account_closed": existingUser["account_closed"],
                     "date_created": existingUser["date_created"],
@@ -360,14 +380,15 @@ class User(Resource):
         return helpers.return_request(UserResponsePut, HTTPStatus.NOT_FOUND)
 
     # verbo PATCH - actualizar contrasenia.
-    # solo permite op=replace y path=password/path=avatar/url
+    # solo permite op=replace y path=password / path=avatar
     # { "op": "replace", "path": "/password", "value": "" }
-    # { "op": "replace", "path": "/avatar/url", "value": "" }
+    # { "op": "replace", "path": "/avatar", "value": "" }
     @helpers.require_apikey
     @helpers.log_reqId
     def patch(self, username):
         authServer.app.logger.info(helpers.log_request_id() +
-                                   "Password modification for user '" +
+                                   "Password or Avatar " +
+                                   "modification for user '" +
                                    username +
                                    "' requested.")
         try:
@@ -377,7 +398,7 @@ class User(Resource):
                                 choices=['replace'])
             parser.add_argument("path", type=helpers.non_empty_string,
                                 required=True, nullable=False,
-                                choices=['/password', '/avatar/url'])
+                                choices=['/password', '/avatar'])
             parser.add_argument("value", type=helpers.non_empty_string,
                                 required=True, nullable=False)
             args = parser.parse_args()
@@ -391,9 +412,17 @@ class User(Resource):
             return helpers.return_request(UserResponsePatch,
                                           HTTPStatus.BAD_REQUEST)
 
-        if (args["path"] == "/avatar/url"):
+        if (args["path"] == "/avatar"):
             try:
-                url = helpers.non_empty_avatar(args.get("value", ""))
+                isUrl = helpers.\
+                        non_empty_bool(args["value"].get("isUrl", ""))
+                if (isUrl is True):
+                    data = helpers.\
+                           non_empty_url(args["value"].get("data", ""))
+                else:
+                    data = helpers.\
+                           non_empty_image(args["value"].get("data", ""))
+
             except Exception:
                 UserResponsePatch = {
                     "code": -2,
@@ -423,7 +452,10 @@ class User(Resource):
                         return helpers.return_request(userResponsePatch,
                                                       HTTPStatus.BAD_REQUEST)
                 else:
-                    existingUser["avatar"]["url"] = url
+                    existingUser["avatar"] = {
+                                                "isUrl": isUrl,
+                                                "data": data
+                                             }
                 existingUser["date_updated"] = datetime.utcnow().isoformat()
                 authServer.db.users.update_one(
                     {"username": username}, {'$set': existingUser})

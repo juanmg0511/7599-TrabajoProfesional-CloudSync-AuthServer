@@ -9,7 +9,7 @@
 # Importacion de librerias necesarias
 # OS para leer variables de entorno y logging para escribir los logs
 import sys
-import re
+import io
 from datetime import datetime, timedelta
 # Flask, para la implementacion del servidor REST
 from flask import request
@@ -17,6 +17,12 @@ from flask_log_request_id import current_request_id
 from http import HTTPStatus
 # Flask-sendmail para el envio de correo
 from flask_mail import Message
+# base64, math y PIL para la validacion de los avatars
+import base64
+import math
+from PIL import Image
+# Validators, para la validacion de mails y URLs
+import validators
 # Wraps, para implementacion de decorators
 from functools import wraps
 
@@ -64,6 +70,11 @@ def log_reqId(view_function):
 # Funcion que loguea los parametros configurados en variables de entorno
 def config_log():
 
+    if (authServer.app_env != "PROD"):
+        authServer.app.logger.info("*****************************************")
+        authServer.app.logger.info("This server is: " + authServer.app_env)
+        authServer.app.logger.info("*****************************************")
+
     if (authServer.api_key == authServer.api_key_default):
         authServer.app.logger.warning("API key not set, please verify " +
                                       "\"APP_SERVER_API_KEY\". Using " +
@@ -104,6 +115,15 @@ def config_log():
     authServer.app.logger.info("Recovery base URL: \"" +
                                str(authServer.mail_base_url) +
                                "\".")
+    authServer.app.logger.debug("Max avatar width is: \"" +
+                                str(authServer.avatar_max_width) +
+                                "\" pixels.")
+    authServer.app.logger.debug("Max avatar height is: \"" +
+                                str(authServer.avatar_max_height) +
+                                "\" pixels.")
+    authServer.app.logger.debug("Max avatar size is: \"" +
+                                str(authServer.avatar_max_size) +
+                                "\" Bytes.")
 
     return 0
 
@@ -221,28 +241,59 @@ def non_empty_date(d):
 
 # Funcion que chequea si un bool es valido
 def non_empty_bool(b):
-    if (str(b).lower() == "true"):
-        return True
+    if (str(b).lower() == "true"
+       or
+       str(b).lower() == "false"):
+        return b
     else:
-        return False
+        raise ValueError("Must be valid bool.")
 
 
 # Funcion que chequea si un email es valido
 def non_empty_email(e):
-    if (re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",
-                 e)
-       is None):
+    if (not validators.email(e)):
         raise ValueError("Must be valid email.")
     return e
 
 
-# Funcion que chequea si un avatar es valido
-def non_empty_avatar(a):
-    if (re.match(r"([(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\-\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))",
-                 a)
-       is None):
+# Funcion que chequea si una url es valida
+def non_empty_url(u):
+    if (not validators.url(u)):
         raise ValueError("Must be valid URL.")
-    return a
+    return u
+
+
+# Funcion que chequea si una imagen de avatar es valida (base64)
+# Configuracion mediante variables de entorno
+# Ancho maximo (px): AVATAR_MAX_WIDTH
+# Altura maxima (px): AVATAR_MAX_HEIGHT
+# Tamanio limite (B): AVATAR_MAX_SIZE
+def non_empty_image(i):
+    # Validamos si el string pasado por parametro es una imagen
+    try:
+        image = base64.b64decode(i)
+        img = Image.open(io.BytesIO(image))
+    except Exception:
+        raise ValueError("Must be valid base64 encoded image.")
+
+    # Validacion de formatos
+    if img.format.lower() in ["jpg", "jpeg", "png"]:
+        # Validacion de ancho y alto
+        width, height = img.size
+        if (width <= int(authServer.avatar_max_width)
+           and height <= int(authServer.avatar_max_height)):
+            # Validacion de tamanio
+            fileSize = math.ceil(len(i) / 4) * 3
+            if (fileSize <= int(authServer.avatar_max_size)):
+                return i
+            else:
+                raise ValueError("Image size exceeds the " +
+                                 "maximum allowed value.")
+        else:
+            raise ValueError("Image dimensions exceed the " +
+                             "maximum allowed values.")
+    else:
+        raise ValueError("Image must be in jpg or png format.")
 
 
 # Funcion que envia el correo de recupero de contraseña

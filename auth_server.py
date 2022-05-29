@@ -53,6 +53,9 @@ sendmail_password_default = None
 sendmail_tls_default = "0"
 sendmail_ssl_default = "1"
 sendmail_base_url_default = "http://127.0.0.1"
+avatar_max_width_default = 256
+avatar_max_height_default = 256
+avatar_max_size_default = 524288
 
 # Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
@@ -137,6 +140,13 @@ prune_interval_sessions = \
 prune_interval_recovery = \
                         os.environ.get("PRUNE_INTERVAL_RECOVERY_SECONDS",
                                        prune_interval_recovery_seconds_default)
+# Lectura de las dimensiones para las imagenes de avatar
+avatar_max_width = os.environ.get("AVATAR_MAX_WIDTH",
+                                  avatar_max_width_default)
+avatar_max_height = os.environ.get("AVATAR_MAX_HEIGHT",
+                                   avatar_max_height_default)
+avatar_max_size = os.environ.get("AVATAR_MAX_SIZE",
+                                 avatar_max_size_default)
 
 
 # Inicializacion - para cuando ejecuta gunicorn + flask

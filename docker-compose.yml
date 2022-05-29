@@ -42,7 +42,14 @@ services:
       SENDMAIL_USE_TLS: "0"
       SENDMAIL_USE_SSL: "1"
       SENDMAIL_BASE_URL: "http://127.0.0.1"
-      # Datos para conectare a la DB
+      # Dimensiones para las imagenes de avatar
+      # Ancho, en pixeles
+      AVATAR_MAX_WIDTH: 256
+      # Ancho, en pixeles
+      AVATAR_MAX_HEIGHT: 256
+      # Tamanio, en bytes
+      AVATAR_MAX_SIZE: 524288
+      # Datos para conectarse a la DB
       MONGODB_DATABASE: auth-server-db
       MONGODB_USERNAME: authserveruser
       MONGODB_PASSWORD: 123456
