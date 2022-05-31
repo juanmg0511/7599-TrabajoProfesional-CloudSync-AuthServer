@@ -43,8 +43,9 @@ class AllSessions(Resource):
             retrievedSession = {
                 "id": str(existingSession["_id"]),
                 "username": existingSession["username"],
+                "user_role": existingSession["user_role"],
                 "session_token": existingSession["session_token"],
-                "expires":  existingSession["expires"],
+                "expires": existingSession["expires"],
                 "date_created": existingSession["date_created"]
             }
             AllSessionsResponseGet.append(retrievedSession)
@@ -265,6 +266,7 @@ class AllSessions(Resource):
                             ).isoformat()
                     sessionToInsert = {
                         "username": args["username"],
+                        "user_role": "admin" if isAdmin else "user",
                         "session_token": str(uuid.uuid1()),
                         "expires": expiry_time,
                         "date_created": datetime.utcnow().isoformat()
@@ -359,6 +361,7 @@ class Session(Resource):
 
                 sessionToUpdate = {
                     "username": existingSession["username"],
+                    "user_role": existingSession["user_role"],
                     "session_token": existingSession["session_token"],
                     "expires":  new_expiry,
                     "date_created": existingSession["date_created"]
