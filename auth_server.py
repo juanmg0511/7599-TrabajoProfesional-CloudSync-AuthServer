@@ -57,6 +57,11 @@ avatar_max_width_default = 256
 avatar_max_height_default = 256
 avatar_max_size_default = 524288
 google_client_id_default = None
+mongodb_hostname_default = "127.0.0.1"
+mongodb_port_default = "27017"
+mongodb_database_default = "auth-server-db"
+mongodb_username_default = "authserveruser"
+mongodb_password_default = "*"
 
 # Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
@@ -101,27 +106,6 @@ google_client_id = os.environ.get("GOOGLE_CLIENT_ID",
 # Inicializacion del parser de request ID
 RequestID(app)
 
-# Inicializacion de la base de datos, MongoDB
-app.config["MONGO_URI"] = "mongodb://" + \
-                          os.environ.get("MONGODB_USERNAME",
-                                         "authserveruser") + \
-                          ":" + \
-                          os.environ.get("MONGODB_PASSWORD",
-                                         "*") + \
-                          "@" + \
-                          os.environ.get("MONGODB_HOSTNAME",
-                                         "127.0.0.1") + \
-                          ":" + \
-                          os.environ.get("MONGODB_PORT",
-                                         "27017") + \
-                          "/" + \
-                          os.environ.get("MONGODB_DATABASE",
-                                         "auth-server-db") + \
-                          "?retryWrites=false"
-mongo = PyMongo(app)
-db = mongo.db
-cl = mongo.cx
-
 # Habilitacion de CORS
 CORS(app)
 
@@ -152,6 +136,34 @@ avatar_max_height = os.environ.get("AVATAR_MAX_HEIGHT",
                                    avatar_max_height_default)
 avatar_max_size = os.environ.get("AVATAR_MAX_SIZE",
                                  avatar_max_size_default)
+# Lectura de la configuracion del servidor de base de datos
+mongodb_hostname = os.environ.get("MONGODB_HOSTNAME",
+                                  mongodb_hostname_default)
+mongodb_port = os.environ.get("MONGODB_PORT",
+                              mongodb_port_default)
+mongodb_database = os.environ.get("MONGODB_DATABASE",
+                                  mongodb_database_default)
+mongodb_username = os.environ.get("MONGODB_USERNAME",
+                                  mongodb_username_default)
+mongodb_password = os.environ.get("MONGODB_PASSWORD",
+                                  mongodb_password_default)
+
+# Inicializacion de la base de datos, MongoDB
+# Inicializacion de la base de datos, MongoDB
+app.config["MONGO_URI"] = "mongodb://" + \
+                          mongodb_username + \
+                          ":" + \
+                          mongodb_password + \
+                          "@" + \
+                          mongodb_hostname + \
+                          ":" + \
+                          mongodb_port + \
+                          "/" + \
+                          mongodb_database + \
+                          "?retryWrites=false"
+mongo = PyMongo(app)
+db = mongo.db
+cl = mongo.cx
 
 
 # Inicializacion - para cuando ejecuta gunicorn + flask

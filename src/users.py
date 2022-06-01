@@ -57,9 +57,15 @@ class AllUsers(Resource):
             show_closed = False
 
         if (show_closed is True):
-            allUsers = authServer.db.users.find()
+            try:
+                allUsers = authServer.db.users.find()
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
         else:
-            allUsers = authServer.db.users.find({"account_closed": False})
+            try:
+                allUsers = authServer.db.users.find({"account_closed": False})
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
 
         AllUsersResponseGet = []
         for existingUser in allUsers:
@@ -187,12 +193,15 @@ class AllUsers(Resource):
                                    args["username"] +
                                    "' requested.")
 
-        existingUser = \
-            authServer.db.users.find_one(
-                {"username": args["username"]})
-        existingAdminUser = \
-            authServer.db.adminusers.find_one(
-                {"username": args["username"]})
+        try:
+            existingUser = \
+                authServer.db.users.find_one(
+                    {"username": args["username"]})
+            existingAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"username": args["username"]})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if ((existingUser is not None) or (existingAdminUser is not None)):
             UserResponsePost = {
                 "code": -5,
@@ -224,7 +233,10 @@ class AllUsers(Resource):
         if (login_service is False):
             userToInsert["password"] = custom_app_context.hash(password)
         UserResponsePost = userToInsert.copy()
-        authServer.db.users.insert_one(userToInsert)
+        try:
+            authServer.db.users.insert_one(userToInsert)
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         id_userToInsert = str(userToInsert["_id"])
         UserResponsePost["id"] = id_userToInsert
         UserResponsePost.pop("password", None)
@@ -247,7 +259,10 @@ class User(Resource):
         authServer.app.logger.info(helpers.log_request_id() + "User '" +
                                    username + "' information requested.")
 
-        existingUser = authServer.db.users.find_one({"username": username})
+        try:
+            existingUser = authServer.db.users.find_one({"username": username})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             UserResponseGet = {
                 "id": str(existingUser["_id"]),
@@ -336,7 +351,10 @@ class User(Resource):
             isUrl = None
             data = None
 
-        existingUser = authServer.db.users.find_one({"username": username})
+        try:
+            existingUser = authServer.db.users.find_one({"username": username})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
 
@@ -362,8 +380,11 @@ class User(Resource):
                 }
 
                 UserResponsePut = userToUpdate.copy()
-                authServer.db.users.update_one(
-                    {"username": username}, {'$set': userToUpdate})
+                try:
+                    authServer.db.users.update_one(
+                        {"username": username}, {'$set': userToUpdate})
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
                 id_userToUpdate = str(existingUser["_id"])
                 UserResponsePut["username"] = existingUser["username"]
                 UserResponsePut["id"] = id_userToUpdate
@@ -438,7 +459,10 @@ class User(Resource):
                 return helpers.return_request(UserResponsePatch,
                                               HTTPStatus.BAD_REQUEST)
 
-        existingUser = authServer.db.users.find_one({"username": username})
+        try:
+            existingUser = authServer.db.users.find_one({"username": username})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
 
@@ -463,8 +487,11 @@ class User(Resource):
                                                 "data": data
                                              }
                 existingUser["date_updated"] = datetime.utcnow().isoformat()
-                authServer.db.users.update_one(
-                    {"username": username}, {'$set': existingUser})
+                try:
+                    authServer.db.users.update_one(
+                        {"username": username}, {'$set': existingUser})
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
 
                 userResponsePatch = {
                     "code": 0,
@@ -498,17 +525,23 @@ class User(Resource):
                                    username +
                                    "' close account requested.")
 
-        existingUser = authServer.db.users.find_one({"username": username})
+        try:
+            existingUser = authServer.db.users.find_one({"username": username})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
 
-                authServer.db.users.update_one(
-                    {"username": username},
-                    {'$set':
-                        {'account_closed': True,
-                         'date_updated': datetime.utcnow().isoformat()}})
-                authServer.db.sessions.delete_many({"username": username})
-                authServer.db.recovery.delete_many({"username": username})
+                try:
+                    authServer.db.users.update_one(
+                        {"username": username},
+                        {'$set':
+                            {'account_closed': True,
+                             'date_updated': datetime.utcnow().isoformat()}})
+                    authServer.db.sessions.delete_many({"username": username})
+                    authServer.db.recovery.delete_many({"username": username})
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
 
                 UserResponseDelete = {
                     "code": 0,
@@ -547,13 +580,19 @@ class UserSessions(Resource):
         authServer.app.logger.info(helpers.log_request_id() + "User '" +
                                    username + "' sessions requested.")
 
-        existingUser = authServer.db.users.find_one({"username": username})
+        try:
+            existingUser = authServer.db.users.find_one({"username": username})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
 
                 UserSessionsResponseGet = []
-                AllUserSessions = \
-                    authServer.db.sessions.find({"username": username})
+                try:
+                    AllUserSessions = \
+                        authServer.db.sessions.find({"username": username})
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
                 for existingSession in AllUserSessions:
                     if (datetime.utcnow()
                        <

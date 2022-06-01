@@ -37,7 +37,10 @@ class AllSessions(Resource):
         authServer.app.logger.info(helpers.log_request_id() +
                                    'All sessions requested.')
         AllSessionsResponseGet = []
-        AllSessions = authServer.db.sessions.find()
+        try:
+            AllSessions = authServer.db.sessions.find()
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
 
         for existingSession in AllSessions:
             retrievedSession = {
@@ -94,13 +97,19 @@ class AllSessions(Resource):
         existingAdminUser = None
         existingUser = None
         if (isAdmin is True):
-            existingAdminUser = authServer.db.adminusers.find_one(
-                                    {"username": args["username"]}
-                                )
+            try:
+                existingAdminUser = authServer.db.adminusers.find_one(
+                                        {"username": args["username"]}
+                                    )
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
         else:
-            existingUser = authServer.db.users.find_one(
-                                    {"username": args["username"]}
-                                )
+            try:
+                existingUser = authServer.db.users.find_one(
+                                        {"username": args["username"]}
+                                    )
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
 
         # Validamos el login del usuario
         if ((existingUser is not None) or (existingAdminUser is not None)):
@@ -272,7 +281,10 @@ class AllSessions(Resource):
                         "date_created": datetime.utcnow().isoformat()
                     }
                     SessionResponsePost = sessionToInsert.copy()
-                    authServer.db.sessions.insert_one(sessionToInsert)
+                    try:
+                        authServer.db.sessions.insert_one(sessionToInsert)
+                    except Exception as e:
+                        return helpers.handleDatabasebError(e)
                     id_sessionToInsert = str(sessionToInsert["_id"])
                     SessionResponsePost["id"] = id_sessionToInsert
 
@@ -325,8 +337,11 @@ class Session(Resource):
                                    "Session with token '" + token +
                                    "' requested.")
 
-        existingSession = authServer.db.sessions.find_one(
-            {"session_token": token})
+        try:
+            existingSession = authServer.db.sessions.find_one(
+                {"session_token": token})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingSession is not None):
             # No hace falta chequear si el usuario de la sesion existe porque
             # borramos todas las sesiones existentes del un usuario al borrarlo
@@ -336,8 +351,11 @@ class Session(Resource):
 
                 # Sesion valida, chequeamos si la sesion es de un admin
                 isAdmin = False
-                existingAdminUser = authServer.db.adminusers.find_one(
-                    {"username": existingSession["username"]})
+                try:
+                    existingAdminUser = authServer.db.adminusers.find_one(
+                        {"username": existingSession["username"]})
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
                 if (existingAdminUser is not None):
                     isAdmin = True
 
@@ -368,8 +386,11 @@ class Session(Resource):
                 }
                 SessionResponseGet = sessionToUpdate.copy()
                 SessionResponseGet["id"] = str(existingSession["_id"])
-                authServer.db.sessions.update_one(
-                    {"session_token": token}, {'$set': sessionToUpdate})
+                try:
+                    authServer.db.sessions.update_one(
+                        {"session_token": token}, {'$set': sessionToUpdate})
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
 
                 return helpers.return_request(SessionResponseGet,
                                               HTTPStatus.OK)
@@ -398,11 +419,17 @@ class Session(Resource):
                                    "Session deletion with token '" + token +
                                    "' requested.")
 
-        existingSession = authServer.db.sessions.find_one(
-            {"session_token": token})
+        try:
+            existingSession = authServer.db.sessions.find_one(
+                {"session_token": token})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingSession is not None):
 
-            authServer.db.sessions.delete_one({"session_token": token})
+            try:
+                authServer.db.sessions.delete_one({"session_token": token})
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
 
             SessionResponseDelete = {
                 "code": 0,

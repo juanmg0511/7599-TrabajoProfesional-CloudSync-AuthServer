@@ -100,7 +100,10 @@ def log_request(response):
     }
 
     # Insertamos el registro en la base de datos
-    authServer.db.requestlog.insert_one(requestLog)
+    try:
+        authServer.db.requestlog.insert_one(requestLog)
+    except Exception as e:
+        return helpers.handleDatabasebError(e)
     authServer.app.logger.debug(helpers.log_request_id() +
                                 'Request data successfully logged to DB.')
     return response
@@ -228,11 +231,17 @@ class RequestLog(Resource):
 
             # Tomamos los requests del dia, y hacemos los calculos
             if (sort_ascending is True):
-                day_records = authServer.db.requestlog.find(query)
+                try:
+                    day_records = authServer.db.requestlog.find(query)
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
             else:
-                day_records = authServer.db.requestlog.\
-                              find(query).\
-                              sort([("_id", -1)])
+                try:
+                    day_records = authServer.db.requestlog.\
+                                find(query).\
+                                sort([("_id", -1)])
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
 
             while True:
                 try:

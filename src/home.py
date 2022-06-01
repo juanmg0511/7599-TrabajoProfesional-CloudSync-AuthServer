@@ -108,7 +108,7 @@ class Status(Resource):
         dbStatus = "offline"
         try:
             # Informacion sobre la instancia de DB, para DEBUG
-            # dbInfo = authServer.cl.server_info()
+            authServer.db.requestlog.find_one()
             dbStatus = "online"
         except Exception:
             dbStatus = "offline"

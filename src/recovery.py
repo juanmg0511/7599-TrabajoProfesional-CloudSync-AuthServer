@@ -34,7 +34,10 @@ class AllRecovery(Resource):
         authServer.app.logger.info(helpers.log_request_id() +
                                    'All password recovery requests requested.')
         AllRecoveryResponseGet = []
-        AllRecoveries = authServer.db.recovery.find()
+        try:
+            AllRecoveries = authServer.db.recovery.find()
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
 
         for existingRecovery in AllRecoveries:
             retrievedRecovery = {
@@ -71,16 +74,22 @@ class AllRecovery(Resource):
                                    "New password recovery request for user '" +
                                    args["username"] + "' requested.")
 
-        existingUser = authServer.db.users.find_one(
-                            {"username": args["username"]})
+        try:
+            existingUser = authServer.db.users.find_one(
+                                {"username": args["username"]})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
                 if (existingUser["login_service"] is False):
-                    existingRecovery = authServer.db.recovery.find_one(
-                                        {"username": args["username"]})
-                    if (existingRecovery is not None):
-                        authServer.db.recovery.delete_one(
-                                        {"username": args["username"]})
+                    try:
+                        existingRecovery = authServer.db.recovery.find_one(
+                                            {"username": args["username"]})
+                        if (existingRecovery is not None):
+                            authServer.db.recovery.delete_one(
+                                            {"username": args["username"]})
+                    except Exception as e:
+                        return helpers.handleDatabasebError(e)
 
                     recoveryToInsert = {
                         "username": args["username"],
@@ -94,7 +103,10 @@ class AllRecovery(Resource):
                         "date_created": datetime.utcnow().isoformat()
                     }
                     RecoveryResponsePost = recoveryToInsert.copy()
-                    authServer.db.recovery.insert_one(recoveryToInsert)
+                    try:
+                        authServer.db.recovery.insert_one(recoveryToInsert)
+                    except Exception as e:
+                        return helpers.handleDatabasebError(e)
                     id_recoveryToInsert = str(recoveryToInsert["_id"])
                     RecoveryResponsePost["id"] = id_recoveryToInsert
 
@@ -148,12 +160,18 @@ class Recovery(Resource):
                                    + username +
                                    "' requested.")
 
-        existingUser = authServer.db.users.find_one({"username": username})
+        try:
+            existingUser = authServer.db.users.find_one({"username": username})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
                 if (existingUser["login_service"] is False):
-                    existingRecovery = authServer.db.recovery.find_one(
-                                        {"username": username})
+                    try:
+                        existingRecovery = authServer.db.recovery.find_one(
+                                            {"username": username})
+                    except Exception as e:
+                        return helpers.handleDatabasebError(e)
                     if (existingRecovery is not None):
                         if (datetime.utcnow()
                            <
@@ -246,12 +264,19 @@ class Recovery(Resource):
                                    username +
                                    "' requested.")
 
-        existingUser = authServer.db.users.find_one({"username": username})
+        try:
+            existingUser = authServer.db.users.find_one({"username": username})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
                 if (existingUser["login_service"] is False):
-                    existingRecovery = \
-                        authServer.db.recovery.find_one({"username": username})
+                    try:
+                        existingRecovery = \
+                            authServer.db.recovery.find_one(
+                                {"username": username})
+                    except Exception as e:
+                        return helpers.handleDatabasebError(e)
                     if (existingRecovery is not None):
                         if (datetime.utcnow()
                            <
@@ -267,13 +292,16 @@ class Recovery(Resource):
                                         args["new_password"])
                                 existingUser["date_updated"] = \
                                     datetime.utcnow().isoformat()
-                                authServer.db.users.update_one(
-                                                     {"username": username},
-                                                     {'$set': existingUser})
+                                try:
+                                    authServer.db.users.update_one(
+                                                        {"username": username},
+                                                        {'$set': existingUser})
 
-                                # Cambiada la password, se borra el request
-                                authServer.db.recovery.delete_one(
-                                                        {"username": username})
+                                    # Cambiada la password, se borra el request
+                                    authServer.db.recovery.delete_one(
+                                        {"username": username})
+                                except Exception as e:
+                                    return helpers.handleDatabasebError(e)
 
                                 RecoveryResponsePost = {
                                     "code": 0,
