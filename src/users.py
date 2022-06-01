@@ -69,7 +69,9 @@ class AllUsers(Resource):
                 "first_name": existingUser["first_name"],
                 "last_name":  existingUser["last_name"],
                 "contact": existingUser["contact"],
-                "avatar": existingUser["avatar"],
+                # Usar el endpoint dedicado para obtener el avatar de
+                # los usuarios
+                "avatar": "...",
                 "login_service": existingUser["login_service"],
                 "account_closed": existingUser["account_closed"],
                 "date_created": existingUser["date_created"],
@@ -253,9 +255,7 @@ class User(Resource):
                 "first_name": existingUser["first_name"],
                 "last_name": existingUser["last_name"],
                 "contact": existingUser["contact"],
-                # Usar el endpoint dedicado para obtener el avatar de
-                # los usuarios
-                "avatar": "...",
+                "avatar": existingUser["avatar"],
                 "login_service": existingUser["login_service"],
                 "account_closed": existingUser["account_closed"],
                 "date_created": existingUser["date_created"],
