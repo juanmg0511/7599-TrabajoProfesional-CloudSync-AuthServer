@@ -11,8 +11,8 @@
 import uuid
 from datetime import datetime, timedelta
 # Flask, para la implementacion del servidor REST
-from flask import request
 from flask_restful import Resource, reqparse
+from flask import request
 from http import HTTPStatus
 # Google auth libraries for 'Sign in with Google'
 from google.oauth2 import id_token
@@ -36,12 +36,85 @@ class AllSessions(Resource):
     def get(self):
         authServer.app.logger.info(helpers.log_request_id() +
                                    'All sessions requested.')
-        AllSessionsResponseGet = []
+
         try:
-            AllSessions = authServer.db.sessions.find()
+            parser = reqparse.RequestParser()
+            # Primer registro de la collection a mostrar
+            # El indice arranca en 0!
+            parser.add_argument("start",
+                                type=int,
+                                required=False,
+                                nullable=False)
+            # Cantidad de registros de la collection a
+            # mostrar por pagina
+            # Si es igual a 0 es como si no estuviera
+            parser.add_argument("limit",
+                                type=int,
+                                required=False,
+                                nullable=False)
+            args = parser.parse_args()
+        except Exception:
+            AllSessionsResponseGet = {
+                "code": -1,
+                "message": "Bad request. Missing required arguments.",
+                "data": None
+            }
+            return helpers.return_request(AllSessionsResponseGet,
+                                          HTTPStatus.BAD_REQUEST)
+
+        # Parseo de los parametros para el pagindo
+        query_start = str(args.get("start", 0))
+        if (query_start != "None"):
+            query_start = int(query_start)
+            if (query_start < 0):
+                query_start = 0
+        else:
+            query_start = 0
+        query_limit = str(args.get("limit", 0))
+        if (query_limit != "None"):
+            query_limit = int(query_limit)
+            if (query_limit < 0):
+                query_limit = 0
+        else:
+            query_limit = 0
+
+        try:
+            AllSessions = authServer.db.sessions.\
+                          find().\
+                          skip(query_start).\
+                          limit(query_limit)
+            AllSessionsCount = authServer.db.sessions.\
+                count_documents({})
         except Exception as e:
             return helpers.handleDatabasebError(e)
 
+        # Calculo de las URL hacia anterior y siguiente
+        start_previous = query_start - query_limit
+        start_next = query_start + query_limit
+        if (start_previous < 0
+           or (start_previous >= AllSessionsCount)
+           or (query_start == 0 and query_limit == 0)
+           or (query_limit == 0)):
+            url_previous = None
+        else:
+            url_previous = request.path +\
+                           "?start=" +\
+                           str(start_previous) +\
+                           "&limit=" +\
+                           str(query_limit)
+
+        if (start_next >= AllSessionsCount
+           or (query_start == 0 and query_limit == 0)
+           or (query_limit == 0)):
+            url_next = None
+        else:
+            url_next = request.path +\
+                       "?start=" +\
+                       str(start_next) +\
+                       "&limit=" +\
+                       str(query_limit)
+
+        AllSessionsResultsGet = []
         for existingSession in AllSessions:
             retrievedSession = {
                 "id": str(existingSession["_id"]),
@@ -51,7 +124,16 @@ class AllSessions(Resource):
                 "expires": existingSession["expires"],
                 "date_created": existingSession["date_created"]
             }
-            AllSessionsResponseGet.append(retrievedSession)
+            AllSessionsResultsGet.append(retrievedSession)
+
+        # Construimos la respuesta paginada
+        AllSessionsResponseGet = {
+            "total": AllSessionsCount,
+            "limit": query_limit,
+            "next": url_next,
+            "previous": url_previous,
+            "results": AllSessionsResultsGet
+        }
 
         return helpers.return_request(AllSessionsResponseGet, HTTPStatus.OK)
 

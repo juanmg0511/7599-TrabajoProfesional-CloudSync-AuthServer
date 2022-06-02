@@ -11,6 +11,7 @@
 from datetime import datetime
 # Flask, para la implementacion del servidor REST
 from flask_restful import Resource, reqparse
+from flask import request
 from http import HTTPStatus
 # Passlib para encriptar contrasenias
 from passlib.apps import custom_app_context
@@ -34,8 +35,23 @@ class AllAdminUsers(Resource):
 
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument("show_closed", type=helpers.non_empty_string,
-                                required=False, nullable=False)
+            parser.add_argument("show_closed",
+                                type=helpers.non_empty_string,
+                                required=False,
+                                nullable=False)
+            # Primer registro de la collection a mostrar
+            # El indice arranca en 0!
+            parser.add_argument("start",
+                                type=int,
+                                required=False,
+                                nullable=False)
+            # Cantidad de registros de la collection a
+            # mostrar por pagina
+            # Si es igual a 0 es como si no estuviera
+            parser.add_argument("limit",
+                                type=int,
+                                required=False,
+                                nullable=False)
             args = parser.parse_args()
         except Exception:
             AllUsersResponseGet = {
@@ -54,19 +70,70 @@ class AllAdminUsers(Resource):
         else:
             show_closed = False
 
+        # Parseo de los parametros para el pagindo
+        query_start = str(args.get("start", 0))
+        if (query_start != "None"):
+            query_start = int(query_start)
+            if (query_start < 0):
+                query_start = 0
+        else:
+            query_start = 0
+        query_limit = str(args.get("limit", 0))
+        if (query_limit != "None"):
+            query_limit = int(query_limit)
+            if (query_limit < 0):
+                query_limit = 0
+        else:
+            query_limit = 0
+
         if (show_closed is True):
             try:
-                allUsers = authServer.db.adminusers.find()
+                allUsers = authServer.db.adminusers.\
+                           find().\
+                           skip(query_start).\
+                           limit(query_limit)
+                allUsersCount = authServer.db.adminusers.\
+                    count_documents({})
             except Exception as e:
                 return helpers.handleDatabasebError(e)
         else:
             try:
-                allUsers = authServer.db.adminusers.find(
-                    {"account_closed": False})
+                allUsers = authServer.db.adminusers.\
+                           find({"account_closed": False}).\
+                           skip(query_start).\
+                           limit(query_limit)
+                allUsersCount = authServer.db.adminusers.\
+                    count_documents({"account_closed": False})
             except Exception as e:
                 return helpers.handleDatabasebError(e)
 
-        AllUsersResponseGet = []
+        # Calculo de las URL hacia anterior y siguiente
+        start_previous = query_start - query_limit
+        start_next = query_start + query_limit
+        if (start_previous < 0
+           or (start_previous >= allUsersCount)
+           or (query_start == 0 and query_limit == 0)
+           or (query_limit == 0)):
+            url_previous = None
+        else:
+            url_previous = request.path +\
+                           "?start=" +\
+                           str(start_previous) +\
+                           "&limit=" +\
+                           str(query_limit)
+
+        if (start_next >= allUsersCount
+           or (query_start == 0 and query_limit == 0)
+           or (query_limit == 0)):
+            url_next = None
+        else:
+            url_next = request.path +\
+                       "?start=" +\
+                       str(start_next) +\
+                       "&limit=" +\
+                       str(query_limit)
+
+        AllUsersResultsGet = []
         for existingUser in allUsers:
             retrievedUser = {
                 "id": str(existingUser["_id"]),
@@ -78,7 +145,16 @@ class AllAdminUsers(Resource):
                 "date_created": existingUser["date_created"],
                 "date_updated": existingUser["date_updated"]
             }
-            AllUsersResponseGet.append(retrievedUser)
+            AllUsersResultsGet.append(retrievedUser)
+
+        # Construimos la respuesta paginada
+        AllUsersResponseGet = {
+            "total": allUsersCount,
+            "limit": query_limit,
+            "next": url_next,
+            "previous": url_previous,
+            "results": AllUsersResultsGet
+        }
 
         return helpers.return_request(AllUsersResponseGet, HTTPStatus.OK)
 
@@ -394,6 +470,47 @@ class AdminUserSessions(Resource):
                                    username + "' sessions requested.")
 
         try:
+            parser = reqparse.RequestParser()
+            # Primer registro de la collection a mostrar
+            # El indice arranca en 0!
+            parser.add_argument("start",
+                                type=int,
+                                required=False,
+                                nullable=False)
+            # Cantidad de registros de la collection a
+            # mostrar por pagina
+            # Si es igual a 0 es como si no estuviera
+            parser.add_argument("limit",
+                                type=int,
+                                required=False,
+                                nullable=False)
+            args = parser.parse_args()
+        except Exception:
+            UserSessionsResponseGet = {
+                "code": -1,
+                "message": "Bad request. Missing required arguments.",
+                "data": None
+            }
+            return helpers.return_request(UserSessionsResponseGet,
+                                          HTTPStatus.BAD_REQUEST)
+
+        # Parseo de los parametros para el pagindo
+        query_start = str(args.get("start", 0))
+        if (query_start != "None"):
+            query_start = int(query_start)
+            if (query_start < 0):
+                query_start = 0
+        else:
+            query_start = 0
+        query_limit = str(args.get("limit", 0))
+        if (query_limit != "None"):
+            query_limit = int(query_limit)
+            if (query_limit < 0):
+                query_limit = 0
+        else:
+            query_limit = 0
+
+        try:
             existingUser = authServer.db.adminusers.find_one(
                 {"username": username})
         except Exception as e:
@@ -401,12 +518,44 @@ class AdminUserSessions(Resource):
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
 
-                UserSessionsResponseGet = []
                 try:
-                    AllUserSessions = authServer.db.sessions.find(
-                        {"username": username})
+                    AllUserSessions = authServer.db.sessions.\
+                                      find({"username": username}).\
+                                      skip(query_start).\
+                                      limit(query_limit)
+                    AllUserSessionsCount = \
+                        authServer.db.sessions.\
+                        count_documents({"username": username})
                 except Exception as e:
                     return helpers.handleDatabasebError(e)
+
+                # Calculo de las URL hacia anterior y siguiente
+                start_previous = query_start - query_limit
+                start_next = query_start + query_limit
+                if (start_previous < 0
+                   or (start_previous >= AllUserSessionsCount)
+                   or (query_start == 0 and query_limit == 0)
+                   or (query_limit == 0)):
+                    url_previous = None
+                else:
+                    url_previous = request.path +\
+                                "?start=" +\
+                                str(start_previous) +\
+                                "&limit=" +\
+                                str(query_limit)
+
+                if (start_next >= AllUserSessionsCount
+                   or (query_start == 0 and query_limit == 0)
+                   or (query_limit == 0)):
+                    url_next = None
+                else:
+                    url_next = request.path +\
+                            "?start=" +\
+                            str(start_next) +\
+                            "&limit=" +\
+                            str(query_limit)
+
+                UserSessionsResultsGet = []
                 for existingSession in AllUserSessions:
                     if (datetime.utcnow()
                        <
@@ -418,7 +567,17 @@ class AdminUserSessions(Resource):
                             "expires":  existingSession["expires"],
                             "date_created": existingSession["date_created"]
                         }
-                        UserSessionsResponseGet.append(retrievedSession)
+                        UserSessionsResultsGet.append(retrievedSession)
+
+                # Construimos la respuesta paginada
+                UserSessionsResponseGet = {
+                    "total": AllUserSessionsCount,
+                    "limit": query_limit,
+                    "next": url_next,
+                    "previous": url_previous,
+                    "results": UserSessionsResultsGet
+                }
+
                 return helpers.return_request(UserSessionsResponseGet,
                                               HTTPStatus.OK)
 
