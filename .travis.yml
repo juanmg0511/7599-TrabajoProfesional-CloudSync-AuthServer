@@ -33,9 +33,10 @@ after_success:
   # submit results to coveralls, on success
   - coveralls
 branches:
-  # do not include these branches
-  except:
-    - develop
+  # include ONLY these branches
+  only:
+    - qa
+    - master
 deploy:
   - provider: script
     script:
@@ -45,8 +46,15 @@ deploy:
       docker push juanmg0511/7599-trabajoprofesional-cloudsync-authserver:qa;
       docker push registry.heroku.com/$HEROKU_APP_NAME_QA/web;
       heroku container:release web --app $HEROKU_APP_NAME_QA
+    api_key: $HEROKU_PASSWORD
     on:
       branch: qa
+  #- provider: heroku
+  #  app: $HEROKU_APP_NAME_QA
+  #  api_key: $HEROKU_PASSWORD
+  #  on:
+  #    branch: qa
+
   - provider: script
     script:
       # build docker images, push to dockerhub & heroku
