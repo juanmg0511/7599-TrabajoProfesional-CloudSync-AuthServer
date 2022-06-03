@@ -33,3 +33,9 @@ El mismo consiste en la creación de un juego en 2D con mecánicas _roguelike_ c
 - Ejecutar en el root del repositorio: `docker-compose build`
 - Ejecutar en el root del repositorio: `docker-compose up`
 - El server estrá disponible en: **127.0.0.1:81**
+
+### Tests
+
+- Ejecutar los siguientes comandos, con el ambiente levantado
+`docker exec -u root -it auth-server-flask bash -c "coverage run --omit */virtualenv/* -m unittest tests/*.py -v"`
+`docker exec -u root -it auth-server-flask bash -c "coverage report"`
