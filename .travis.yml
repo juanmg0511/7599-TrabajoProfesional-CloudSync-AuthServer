@@ -32,6 +32,10 @@ script:
 after_success:
   # submit results to coveralls, on success
   - coveralls
+branches:
+  # do not include these branches
+  except:
+    - develop
 deploy:
   - provider: script
     script:
