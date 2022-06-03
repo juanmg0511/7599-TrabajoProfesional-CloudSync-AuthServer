@@ -18,7 +18,7 @@ before_install:
   - echo "$HEROKU_PASSWORD" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
 install:
   # install requirements
-  - pip install coverage coveralls PyYAML
+  - pip install -U coverage coveralls PyYAML
   # create copy of source code to mirror docker-compose structure
   - sudo mkdir /home/ubuntu/
   - sudo find . -name "*.py" -exec rsync -qR {} /home/ubuntu \;
