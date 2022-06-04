@@ -52,11 +52,14 @@ services:
       #Configuracion para Google login
       GOOGLE_CLIENT_ID: "*"
       # Datos para conectarse a la DB
-      MONGODB_DATABASE: auth-server-db
-      MONGODB_USERNAME: authserveruser
-      MONGODB_PASSWORD: 123456
-      MONGODB_HOSTNAME: auth-server-mongodb
-      MONGODB_PORT: 27017
+      MONGODB_DATABASE: "auth-server-db"
+      MONGODB_USERNAME: "authserveruser"
+      MONGODB_PASSWORD: "123456"
+      MONGODB_HOSTNAME: "auth-server-mongodb:27017"
+      MONGODB_SSL: "false"
+      MONGODB_REPLICA_SET: "None"
+      MONGODB_AUTH_SOURCE: "None"
+
     volumes:
        - authserverlogs:/home/ubuntu/logs
        - ".:/home/ubuntu/" 

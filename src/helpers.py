@@ -96,13 +96,17 @@ def config_log():
         authServer.app.logger.warning("**************************************")
 
     authServer.app.logger.info("Database server: " +
-                               authServer.mongodb_hostname +
-                               ":" +
-                               authServer.mongodb_port)
+                               authServer.mongodb_hostname)
     authServer.app.logger.debug("Database name: " +
                                 authServer.mongodb_database)
     authServer.app.logger.debug("Database username: " +
                                 authServer.mongodb_username)
+    authServer.app.logger.debug("Database using SSL: " +
+                                authServer.mongodb_ssl)
+    authServer.app.logger.info("Database replica set: " +
+                               authServer.mongodb_replica_set)
+    authServer.app.logger.debug("Database auth source: " +
+                                authServer.mongodb_auth_source)
 
     if (authServer.api_key == authServer.api_key_default):
         authServer.app.logger.warning("API key not set, please verify " +
