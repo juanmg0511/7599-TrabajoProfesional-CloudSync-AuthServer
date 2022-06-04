@@ -166,11 +166,10 @@ app.config["MONGO_URI"] = "mongodb://" + \
                           mongodb_database + \
                           "?ssl=" + \
                           mongodb_ssl +\
-                          "" if mongodb_replica_set == "None" else \
-                              "&replicaSet=" + mongodb_replica_set + \
-                          "" if mongodb_auth_source == "None" else \
-                              "&authSource=" + mongodb_auth_source + \
-                          mongodb_auth_source + \
+                          ("" if (mongodb_replica_set == "None") else
+                              ("&replicaSet=" + mongodb_replica_set)) + \
+                          ("" if (mongodb_auth_source) == "None" else
+                              ("&authSource=" + mongodb_auth_source)) + \
                           "&retryWrites=true" + \
                           "&w=majority"
 
