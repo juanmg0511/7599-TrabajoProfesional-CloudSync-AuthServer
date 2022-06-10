@@ -59,6 +59,8 @@ services:
       MONGODB_SSL: "false"
       MONGODB_REPLICA_SET: "None"
       MONGODB_AUTH_SOURCE: "None"
+      # Secret para los token JWT
+      JWT_SECRET: "MINSjxVsRZ6QErNX74wBIUBmm62ExN5"
 
     volumes:
        - authserverlogs:/home/ubuntu/logs

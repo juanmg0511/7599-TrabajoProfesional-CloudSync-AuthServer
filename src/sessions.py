@@ -6,14 +6,21 @@
 # https://codeburst.io/this-is-how-easy-it-is-to-create-a-rest-api-8a25122ab1f3
 # https://medium.com/@riken.mehta/full-stack-tutorial-flask-react-docker-ee316a46e876
 
+# Manejo de tokens con Flask-JWT-Extended:
+# https://content.breatheco.de/es/lesson/what-is-JWT-and-how-to-implement-with-Flask
+# https://flask-jwt-extended.readthedocs.io/en/stable/api/#flask_jwt_extended.create_access_token
+# https://flask-jwt-extended.readthedocs.io/en/stable/api/#flask_jwt_extended.decode_token
+
 # Importacion de librerias necesarias
 # OS para leer variables de entorno y logging para escribir los logs
-import uuid
 from datetime import datetime, timedelta
 # Flask, para la implementacion del servidor REST
 from flask_restful import Resource, reqparse
 from flask import request
 from http import HTTPStatus
+# Flask-JWT-Extended para la generacion de tokens
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import decode_token
 # Google auth libraries for 'Sign in with Google'
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -137,7 +144,7 @@ class AllSessions(Resource):
 
         return helpers.return_request(AllSessionsResponseGet, HTTPStatus.OK)
 
-    # verbo POST - crear sesion, si existe refresca el token
+    # verbo POST - crear sesion
     @helpers.require_apikey
     @helpers.log_reqId
     def post(self):
@@ -355,10 +362,27 @@ class AllSessions(Resource):
                                     authServer.session_length_user)
                                 )
                             ).isoformat()
+
+                    # Generamos el token, con formato JWT
+                    # Como manejamos sesiones stateful, el venicimiento se
+                    # guarda en el servidor
+                    try:
+                        token = create_access_token(identity=args["username"],
+                                                    expires_delta=False)
+                    except Exception:
+                        SessionResponsePost = {
+                            "code": -1,
+                            "message": "Error creating acces token.",
+                            "data": None
+                        }
+                        return helpers.return_request(
+                            SessionResponsePost,
+                            HTTPStatus.SERVICE_UNAVAILABLE)
+
                     sessionToInsert = {
                         "username": args["username"],
                         "user_role": "admin" if isAdmin else "user",
-                        "session_token": str(uuid.uuid1()),
+                        "session_token": token,
                         "expires": expiry_time,
                         "date_created": datetime.utcnow().isoformat()
                     }
@@ -418,15 +442,33 @@ class Session(Resource):
         authServer.app.logger.info(helpers.log_request_id() +
                                    "Session with token '" + token +
                                    "' requested.")
-
         try:
             existingSession = authServer.db.sessions.find_one(
                 {"session_token": token})
         except Exception as e:
             return helpers.handleDatabasebError(e)
+
+        # La sesion existe
         if (existingSession is not None):
             # No hace falta chequear si el usuario de la sesion existe porque
             # borramos todas las sesiones existentes del un usuario al borrarlo
+            try:
+                # Chequeamos si el token suministrado es valido
+                token_data = decode_token(token)
+
+                # Vemos si el usuario coincide con el de la sesion
+                if (token_data["identity"] != existingSession["username"]):
+                    raise(Exception)
+            except Exception:
+                SessionResponseGet = {
+                    "code": -1,
+                    "message": "Invalid token '" + token + "' supplied.",
+                    "data": None
+                }
+                return helpers.return_request(SessionResponseGet,
+                                              HTTPStatus.UNAUTHORIZED)
+
+            # Revisamos si la sesion esta vencida
             if (datetime.utcnow()
                <
                datetime.fromisoformat(existingSession["expires"])):

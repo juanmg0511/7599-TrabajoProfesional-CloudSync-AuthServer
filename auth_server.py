@@ -20,6 +20,8 @@ from flask_cors import CORS
 from flask_mail import Mail
 # PyMongo para el manejo de MongoDB
 from flask_pymongo import PyMongo
+# Flask-JWT-Extended para la generacion de tokens
+from flask_jwt_extended import JWTManager
 # Flask-APScheduler para el prune de la collection de sesiones
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -64,6 +66,7 @@ mongodb_password_default = "*"
 mongodb_ssl_default = "false"
 mongodb_replica_set_default = "None"
 mongodb_auth_source_default = "None"
+jwt_secret_default = "super-secret"
 
 # Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
@@ -100,6 +103,9 @@ mail_base_url = os.environ.get("SENDMAIL_BASE_URL", sendmail_from_default)
 with open("templates/mailTemplate.html", "r") as mail_template_fp:
     mail_template = str(mail_template_fp.read())
 mail = Mail(app)
+# Lectura del secret para los token jwt
+jwt_secret = os.environ.get("JWT_SECRET",
+                            jwt_secret_default)
 
 # Inicializacion de Google login
 google_client_id = os.environ.get("GOOGLE_CLIENT_ID",
@@ -110,6 +116,10 @@ RequestID(app)
 
 # Habilitacion de CORS
 CORS(app)
+
+# Inicializacion de JWT
+app.config["JWT_SECRET_KEY"] = jwt_secret
+jwt = JWTManager(app)
 
 # Lectura de la configuración de ambiente
 app_env = os.environ.get("APP_ENV", app_env_default)
@@ -153,7 +163,6 @@ mongodb_replica_set = os.environ.get("MONGODB_REPLICA_SET",
                                      mongodb_replica_set_default)
 mongodb_auth_source = os.environ.get("MONGODB_AUTH_SOURCE",
                                      mongodb_auth_source_default)
-
 
 # Inicializacion de la base de datos, MongoDB
 app.config["MONGO_URI"] = "mongodb://" + \
