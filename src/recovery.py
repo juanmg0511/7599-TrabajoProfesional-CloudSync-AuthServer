@@ -8,12 +8,14 @@
 
 # Importacion de librerias necesarias
 # OS para leer variables de entorno y logging para escribir los logs
-import uuid
 from datetime import datetime, timedelta
 # Flask, para la implementacion del servidor REST
 from flask_restful import Resource, reqparse
 from flask import request
 from http import HTTPStatus
+# Flask-JWT-Extended para la generacion de recovery keys
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import decode_token
 # Passlib para encriptar contrasenias
 from passlib.apps import custom_app_context
 
@@ -174,9 +176,25 @@ class AllRecovery(Resource):
                     except Exception as e:
                         return helpers.handleDatabasebError(e)
 
+                    # Generamos el token, con formato JWT
+                    # Como manejamos sesiones stateful, el venicimiento se
+                    # guarda en el servidor
+                    try:
+                        token = create_access_token(identity=args["username"],
+                                                    expires_delta=False)
+                    except Exception:
+                        SessionResponsePost = {
+                            "code": -1,
+                            "message": "Error creating acces token.",
+                            "data": None
+                        }
+                        return helpers.return_request(
+                            SessionResponsePost,
+                            HTTPStatus.SERVICE_UNAVAILABLE)
+
                     recoveryToInsert = {
                         "username": args["username"],
-                        "recovery_key": str(uuid.uuid1()),
+                        "recovery_key": token,
                         "expires": (datetime.utcnow() +
                                     timedelta(
                                         minutes=int(
@@ -360,7 +378,29 @@ class Recovery(Resource):
                                 {"username": username})
                     except Exception as e:
                         return helpers.handleDatabasebError(e)
+
                     if (existingRecovery is not None):
+                        try:
+                            # Chequeamos si el token suministrado es valido
+                            key_data = decode_token(args["recovery_key"])
+
+                            # Vemos si el usuario coincide con el de la sesion
+                            if (key_data["identity"]
+                               !=
+                               existingRecovery["username"]):
+                                raise(Exception)
+                        except Exception:
+                            SessionResponseGet = {
+                                "code": -1,
+                                "message": "Invalid recovery key '" +
+                                           args["recovery_key"] +
+                                           "' supplied.",
+                                "data": None
+                            }
+                            return helpers.return_request(
+                                SessionResponseGet,
+                                HTTPStatus.UNAUTHORIZED)
+
                         if (datetime.utcnow()
                            <
                            datetime.fromisoformat(

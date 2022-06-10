@@ -135,7 +135,7 @@ class RecoveryTestCase(unittest.TestCase):
                               )
                           )
         self.assertEqual(HTTPStatus.UNAUTHORIZED, r.status_code)
-        self.assertEqual(-4, r.json["code"])
+        self.assertEqual(-1, r.json["code"])
 
     def test_post_recovery_non_existing_user_should_return_not_found_2(self):
         r = self.app.post('/api/v1/recovery/testunituser_post_not_found',
