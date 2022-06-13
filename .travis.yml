@@ -7,7 +7,7 @@
 sudo: required
 language: python
 python:
-  - 3.6
+  - 3.8
 services:
   - docker
 before_install:
@@ -28,7 +28,7 @@ install:
   - docker-compose up -d
 script: 
   # unit tests w/coverage, in docker-compose env
-  - docker exec -u root -it auth-server-flask bash -c "coverage run --omit */virtualenv/* -m unittest tests/*.py -v"
+  - docker exec -u root -it auth-server-flask bash -c "coverage run --omit */virtualenv/*,*/usr/* -m unittest tests/*.py -v"
   - coverage report
 after_success:
   # submit results to coveralls, on success

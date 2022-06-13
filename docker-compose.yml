@@ -1,3 +1,7 @@
+# CloudSync - Auth Server
+# Flask + MongoDB - on Gunicorn
+# docker-compose.yml
+
 version: '3'
 services:
 
@@ -74,7 +78,7 @@ services:
       - backend
 
   mongodb:
-    image: mongo:4.2.7
+    image: mongo:5.0.9
     container_name: auth-server-mongodb
     restart: unless-stopped
     command: mongod --auth
