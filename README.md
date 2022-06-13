@@ -49,5 +49,5 @@ https://fiuba-qa-7599-cs-auth-server.herokuapp.com/
 #### Tests
 
 - Ejecutar los siguientes comandos, con el ambiente levantado  
-`docker exec -u root -it auth-server-flask bash -c "coverage run --omit */virtualenv/* -m unittest tests/*.py -v"`  
+`docker exec -u root -it auth-server-flask bash -c "coverage run --omit */virtualenv/*,*/usr/* -m unittest tests/*.py -v"`  
 `docker exec -u root -it auth-server-flask bash -c "coverage report"`
