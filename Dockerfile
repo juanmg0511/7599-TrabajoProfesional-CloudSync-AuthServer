@@ -17,22 +17,22 @@ RUN apt-get update && \
 # Requirements and directory structure creation
 COPY requirements.txt /root/
 RUN pip install -r /root/requirements.txt && \
-    useradd -m authuser && \
-    mkdir /home/authuser/logs && \
-    mkdir /home/authuser/src && \
-    mkdir /home/authuser/tests && \
-    mkdir /home/authuser/templates
+    useradd -m ubuntu && \
+    mkdir /home/ubuntu/logs && \
+    mkdir /home/ubuntu/src && \
+    mkdir /home/ubuntu/tests && \
+    mkdir /home/ubuntu/templates
 # Creating log file
-RUN touch /home/authuser/logs/auth_server.log
+RUN touch /home/ubuntu/logs/auth_server.log
 # Setting environment
-ENV HOME=/home/authuser
-USER authuser
+ENV HOME=/home/ubuntu
+USER ubuntu
 # Copying files
-COPY auth_server.py gunicorn_config.py /home/authuser/
-COPY src /home/authuser/src
-COPY templates /home/authuser/templates
-COPY tests /home/authuser/tests
+COPY auth_server.py gunicorn_config.py /home/ubuntu/
+COPY src /home/ubuntu/src
+COPY templates /home/ubuntu/templates
+COPY tests /home/ubuntu/tests
 # Configuring network and launching server
-WORKDIR /home/authuser/
+WORKDIR /home/ubuntu/
 EXPOSE 8000
 CMD ["gunicorn", "-c", "gunicorn_config.py", "auth_server:app"]
