@@ -6,6 +6,7 @@
 # Importacion de librerias necesarias
 import unittest
 import logging
+from http import HTTPStatus
 
 # Importacion del archivo principal
 import auth_server
@@ -46,6 +47,11 @@ class HelpersTestCase(unittest.TestCase):
     def test_config_log_should_return_0(self):
         r = helpers.config_log()
         self.assertEqual(0, r)
+
+    def test_handle_database_error_should_return_service_unavailable(self):
+        r = helpers.handleDatabasebError("Test")
+        self.assertEqual(HTTPStatus.SERVICE_UNAVAILABLE, r[1])
+        self.assertEqual(-1, r[0]["code"])
 
 
 if __name__ == '__main__':

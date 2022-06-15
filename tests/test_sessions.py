@@ -30,12 +30,16 @@ class SessionsTestCase(unittest.TestCase):
         aux_functions.createTestUser("testunituser_get", cls)
         aux_functions.createTestUser("testunituser_get_not_recovery", cls)
         aux_functions.createTestUser("testunituser_post", cls)
+        aux_functions.createTestUser("testunituser_post_closed", cls)
         aux_functions.createTestUser("testunituser_post_bad_request", cls)
         aux_functions.createTestUser("testunituser_delete", cls)
         aux_functions.createTestUserService("testunituser_post_service", cls)
+        aux_functions.createAdminTestUser("testunitadminuser_get", cls)
         aux_functions.createAdminTestUser("testunitadminuser_post", cls)
         # Creamos las sessions a ser utilizadas durante los tests
         aux_functions.createSession("testunituser_get", cls)
+        # Cerramos la cuenta del usuario con cuenta cerrada
+        aux_functions.closeAccountTestUser("testunituser_post_closed", cls)
 
     @classmethod
     def tearDownClass(cls):
@@ -43,9 +47,11 @@ class SessionsTestCase(unittest.TestCase):
         aux_functions.deleteTestUser("testunituser_get")
         aux_functions.deleteTestUser("testunituser_get_no_session")
         aux_functions.deleteTestUser("testunituser_post")
+        aux_functions.deleteTestUser("testunituser_post_closed")
         aux_functions.deleteTestUser("testunituser_post_bad_request")
         aux_functions.deleteTestUser("testunituser_delete")
         aux_functions.deleteTestUser("testunituser_post_service")
+        aux_functions.deleteAdminTestUser("testunitadminuser_get")
         aux_functions.deleteAdminTestUser("testunitadminuser_post")
         print("Finished testing path \"/sessions\" of the auth server!")
 
@@ -81,6 +87,86 @@ class SessionsTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
         self.assertEqual(-1, r.json["code"])
 
+    def test_post_session_without_password_should_return_bad_request(self):
+        r = self.app.post('/api/v1/sessions',
+                          headers={'Content-Type': 'application/json',
+                                   'X-Client-ID': aux_functions.X_Client_ID},
+                          json=dict(
+                              username="testunituser_post"
+                             )
+                          )
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-3, r.json["code"])
+
+    def test_post_session_with_token_should_return_bad_request(self):
+        r = self.app.post('/api/v1/sessions',
+                          headers={'Content-Type': 'application/json',
+                                   'X-Client-ID': aux_functions.X_Client_ID},
+                          json=dict(
+                              username="testunituser_post",
+                              login_service_token="fake-token"
+                              )
+                          )
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-3, r.json["code"])
+
+    def test_post_session_with_password_should_return_bad_request(self):
+        r = self.app.post('/api/v1/sessions',
+                          headers={'Content-Type': 'application/json',
+                                   'X-Client-ID': aux_functions.X_Client_ID},
+                          json=dict(
+                              username="testunituser_post_service",
+                              password="password"
+                              )
+                          )
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-4, r.json["code"])
+
+    def test_post_session_without_token_should_return_bad_request(self):
+        r = self.app.post('/api/v1/sessions',
+                          headers={'Content-Type': 'application/json',
+                                   'X-Client-ID': aux_functions.X_Client_ID},
+                          json=dict(
+                              username="testunituser_post_service"
+                              )
+                          )
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-4, r.json["code"])
+
+    def test_post_session_invalid_token_should_return_unauthorized(self):
+        r = self.app.post('/api/v1/sessions',
+                          headers={'Content-Type': 'application/json',
+                                   'X-Client-ID': aux_functions.X_Client_ID},
+                          json=dict(
+                              username="testunituser_post_service",
+                              login_service_token="eyJ0eXAiOiJKV1QiLCJhbGciO" +
+                                                  "iJIUzI1NiJ9.eyJpYXQiOjE2N" +
+                                                  "TUzMDMxNzcsIm5iZiI6MTY1NT" +
+                                                  "MwMzE3NywianRpIjoiMDQ0NDF" +
+                                                  "jYmEtYzZhNS00ZjQ1LWE5N2Yt" +
+                                                  "NmNjOGMxZWFlMTA5IiwiaWRlb" +
+                                                  "nRpdHkiOiJjbG91ZHN5bmNnb2" +
+                                                  "QiLCJmcmVzaCI6ZmFsc2UsInR" +
+                                                  "5cGUiOiJhY2Nlc3MifQ.WBA1C" +
+                                                  "ACXBupn3bPHSfVQ37AuBPLyno" +
+                                                  "a7c2OHG53lSLQ"
+                              )
+                          )
+        self.assertEqual(HTTPStatus.UNAUTHORIZED, r.status_code)
+        self.assertEqual(-3, r.json["code"])
+
+    def test_post_session_closed_account_should_return_bad_request(self):
+        r = self.app.post('/api/v1/sessions',
+                          headers={'Content-Type': 'application/json',
+                                   'X-Client-ID': aux_functions.X_Client_ID},
+                          json=dict(
+                              username="testunituser_post_closed",
+                              password="password"
+                              )
+                          )
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-2, r.json["code"])
+
     def test_post_session_non_existing_user_should_return_unauthorized(self):
         r = self.app.post('/api/v1/sessions',
                           headers={'Content-Type': 'application/json',
@@ -111,14 +197,52 @@ class SessionsTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
 
-    def test_get_session_non_existing_user_should_return_unauthorized(self):
+    def test_get_all_sessions_paging_should_return_ok(self):
+        r = self.app.get('/api/v1/sessions?start=0&limit=1',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+        self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_all_sessions_paging_invalid_should_return_ok(self):
+        r = self.app.get('/api/v1/sessions?start=-1&limit=-1',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+        self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_session_invalid_token_user_should_return_unauthorized(self):
         r = self.app.get('/api/v1/sessions/fake-token',
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.UNAUTHORIZED, r.status_code)
         self.assertEqual(-3, r.json["code"])
 
+    def test_get_session_invalid_user_token_should_return_unauthorized(self):
+        r = self.app.get('/api/v1/sessions/eyJ0eXAiOiJKV1QiLCJhbGciO' +
+                         'iJIUzI1NiJ9.eyJpYXQiOjE2N' +
+                         'TUzMDMxNzcsIm5iZiI6MTY1NT' +
+                         'MwMzE3NywianRpIjoiMDQ0NDF' +
+                         'jYmEtYzZhNS00ZjQ1LWE5N2Yt' +
+                         'NmNjOGMxZWFlMTA5IiwiaWRlb' +
+                         'nRpdHkiOiJjbG91ZHN5bmNnb2' +
+                         'QiLCJmcmVzaCI6ZmFsc2UsInR' +
+                         '5cGUiOiJhY2Nlc3MifQ.WBA1C' +
+                         'ACXBupn3bPHSfVQ37AuBPLyno' +
+                         'a7c2OHG53lSLQ',
+                         headers={'Content-Type': 'application/json',
+                                  'X-Client-ID': aux_functions.X_Client_ID}
+                         )
+        self.assertEqual(HTTPStatus.UNAUTHORIZED, r.status_code)
+        self.assertEqual(-3, r.json["code"])
+
     def test_get_session_user_should_return_ok(self):
         r1 = aux_functions.createSession("testunituser_get", self)
+        r2 = self.app.get('/api/v1/sessions/' + str(r1.json['session_token']),
+                          headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r2.status_code)
+        self.assertEqual(str(r1.json['session_token']),
+                         r2.json["session_token"])
+
+    def test_get_session_admin_user_should_return_ok(self):
+        r1 = aux_functions.createSessionAdmin("testunitadminuser_get", self)
         r2 = self.app.get('/api/v1/sessions/' + str(r1.json['session_token']),
                           headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r2.status_code)

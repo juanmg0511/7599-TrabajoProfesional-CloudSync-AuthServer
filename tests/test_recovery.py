@@ -95,6 +95,18 @@ class RecoveryTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
 
+    def test_get_all_recovery_requests_paging_should_return_ok(self):
+        r = self.app.get('/api/v1/recovery?start=0&limit=1',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+        self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_all_recovery_requests_paging_invalid_should_return_ok(self):
+        r = self.app.get('/api/v1/recovery?start=-1&limit=-1',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+        self.assertEqual(True, len(r.json) > 0)
+
     def test_get_recovery_non_existing_user_should_return_not_found(self):
         r = self.app.get('/api/v1/recovery/testunituser_get_not_found',
                          headers={'X-Client-ID': aux_functions.X_Client_ID})

@@ -43,6 +43,12 @@ class HomeTestCase(unittest.TestCase):
         r = self.app.get('/stats?startdate=' + today + '&enddate=' + today)
         self.assertEqual(HTTPStatus.OK, r.status_code)
 
+    def test_stats_sort_should_return_ok(self):
+        today = str(datetime.utcnow().date())
+        r = self.app.get('/stats?startdate=' + today + '&enddate=' + today +
+                         '&sort_ascending=true')
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+
     def test_stats_should_return_bad_request(self):
         r = self.app.get('/stats?startdate=invaliddate&enddate=2022-05-01')
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
