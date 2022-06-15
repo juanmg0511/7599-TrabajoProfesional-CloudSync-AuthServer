@@ -357,7 +357,7 @@ def non_empty_image(i):
 
 
 # Funcion que envia el correo de recupero de contraseña
-def send_recovery_notification(user, recovery_key):
+def send_recovery_notification(user, recovery_key, force_send=False):
 
     authServer.app.logger.info(log_request_id() +
                                "Sending mail to user: \"" +
@@ -365,7 +365,7 @@ def send_recovery_notification(user, recovery_key):
                                "\" at \"" +
                                str(user["contact"]["email"]) + "\".")
 
-    if (authServer.mail_active is False):
+    if (authServer.mail_active is False and force_send is False):
         authServer.app.logger.warning(log_request_id() +
                                       "Send mail functionality is " +
                                       "DISABLED. Please enable " +
@@ -390,9 +390,7 @@ def send_recovery_notification(user, recovery_key):
         replace("wwww://wwwww-wwwwww-w-www-wwwww.wwwwwwwww.www",
                 authServer.mail_base_url).\
         replace("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                recovery_key).\
-        replace("yyyy-yyyy-yyyy",
-                user["username"])
+                recovery_key)
     message = "Mail dispatched successfully."
     exception = None
     try:
