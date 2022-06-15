@@ -100,8 +100,7 @@ else:
 mail_from = os.environ.get("SENDMAIL_FROM", sendmail_from_default)
 mail_base_url = os.environ.get("SENDMAIL_BASE_URL", sendmail_from_default)
 # Lectura del template para los mails de recovery
-with open("templates/mailTemplate.html", "r") as mail_template_fp:
-    mail_template = str(mail_template_fp.read())
+mail_template = helpers.loadTextFile("templates/mailTemplate.html")
 mail = Mail(app)
 # Lectura del secret para los token jwt
 jwt_secret = os.environ.get("JWT_SECRET",

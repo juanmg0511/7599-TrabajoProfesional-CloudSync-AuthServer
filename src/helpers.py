@@ -628,3 +628,12 @@ def gatherStats(startdate, enddate, sort_ascending):
         return handleDatabasebError(e)
 
     return statsResult
+
+
+# Devuelve el contenido del archivo pasado por parametro
+def loadTextFile(path):
+    try:
+        with open(path, "r") as path_fp:
+            return str(path_fp.read())
+    except Exception as e:
+        return e
