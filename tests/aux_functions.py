@@ -11,6 +11,21 @@ import auth_server
 X_Client_ID = auth_server.api_key
 
 
+# Crea un usuario de prueba, sin usar la API
+def createTestUserRaw(username):
+    test_user = dict(
+                    username=username,
+                    first_name="test",
+                    last_name="test",
+                    contact=dict(
+                        phone="1545642323",
+                        email="test@mail.com"
+                    )
+    )
+
+    return test_user
+
+
 # Crea un usuario de prueba, usando la API
 def createTestUser(username, cls):
     cls.app.post('/api/v1/users',

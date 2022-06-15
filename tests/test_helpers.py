@@ -49,9 +49,16 @@ class HelpersTestCase(unittest.TestCase):
         self.assertEqual(0, r)
 
     def test_handle_database_error_should_return_service_unavailable(self):
-        r = helpers.handleDatabasebError("Test")
+        r = helpers.handleDatabasebError("test")
         self.assertEqual(HTTPStatus.SERVICE_UNAVAILABLE, r[1])
         self.assertEqual(-1, r[0]["code"])
+
+    def test_send_recovery_notification_should_return_send_fail(self):
+        test_sendmail_user = aux_functions.createTestUserRaw("username")
+        r = helpers.send_recovery_notification(test_sendmail_user,
+                                               "test",
+                                               True)
+        self.assertEqual(0, r)
 
 
 if __name__ == '__main__':
