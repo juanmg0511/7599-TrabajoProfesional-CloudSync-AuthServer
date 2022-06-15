@@ -35,6 +35,10 @@ class UsersTestCase(unittest.TestCase):
         aux_functions.createTestUser("testunituser_delete", cls)
         # Creamos las sessions a ser utilizadas durante los tests
         aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
         # Cerramos la cuenta del usuario con cuenta cerrada
         aux_functions.closeAccountTestUser("testunituser_get_closed", cls)
 
@@ -81,7 +85,11 @@ class UsersTestCase(unittest.TestCase):
                               contact=dict(
                                   phone="1545642323",
                                   email="test@mail.com"
-                                  )
+                                  ),
+                              avatar=dict(
+                                isUrl=True,
+                                data="http://www.google.com"
+                              )
                               )
                           )
         self.assertEqual(HTTPStatus.CREATED, r.status_code)
@@ -167,6 +175,12 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
 
+    def test_get_all_users_closed_should_return_ok(self):
+        r = self.app.get('/api/v1/users?show_clo',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+        self.assertEqual(True, len(r.json) > 0)
+
     def test_get_all_users_paging_should_return_ok(self):
         r = self.app.get('/api/v1/users?start=0&limit=1',
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
@@ -178,6 +192,12 @@ class UsersTestCase(unittest.TestCase):
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_allusers_paging_invalid_should_return_bad_request(self):
+        r = self.app.get('/api/v1/users?start=a&limit=b',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-1, r.json["code"])
 
     def test_get_non_existing_user_should_return_not_found(self):
         r = self.app.get('/api/v1/users/testunituser_get_not_found',
@@ -251,7 +271,11 @@ class UsersTestCase(unittest.TestCase):
                              contact=dict(
                                  phone="1545642323",
                                  email="test@mail.com"
-                                 )
+                                 ),
+                             avtar=dict(
+                                isUrl=True,
+                                data="http://www.google.com"
+                             )
                              )
                          )
         self.assertEqual(HTTPStatus.OK, r.status_code)
@@ -345,10 +369,10 @@ class UsersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/avatar",
-                               value={
-                                "isUrl": True,
-                                "data": "http://www.gogle.com"
-                               }
+                               value=dict(
+                                isUrl=True,
+                                data="http://www.gogle.com"
+                               )
                                )
                            )
         self.assertEqual(HTTPStatus.OK, r.status_code)
@@ -361,10 +385,10 @@ class UsersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/avatar",
-                               value={
-                                "isUrl": True,
-                                "data": "Test"
-                               }
+                               value=dict(
+                                isUrl=True,
+                                data="Test"
+                               )
                                )
                            )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
@@ -377,14 +401,14 @@ class UsersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/avatar",
-                               value={
-                                "isUrl": False,
-                                "data": "\"" +
-                                        helpers.loadTextFile("tests/img/" +
-                                                             "test_img_o" +
-                                                             "k.txt") +
-                                        "\""
-                               }
+                               value=dict(
+                                isUrl=False,
+                                data="\"" +
+                                     helpers.loadTextFile("tests/img/" +
+                                                          "test_img_o" +
+                                                          "k.txt") +
+                                     "\""
+                               )
                                )
                            )
         self.assertEqual(HTTPStatus.OK, r.status_code)
@@ -397,14 +421,14 @@ class UsersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/avatar",
-                               value={
-                                "isUrl": False,
-                                "data": "\"" +
-                                        helpers.loadTextFile("tests/img/" +
-                                                             "test_img_n" +
-                                                             "ok_dim.txt") +
-                                        "\""
-                               }
+                               value=dict(
+                                isUrl=False,
+                                data="\"" +
+                                     helpers.loadTextFile("tests/img/" +
+                                                          "test_img_n" +
+                                                          "ok_dim.txt") +
+                                     "\""
+                               )
                                )
                            )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
@@ -417,14 +441,14 @@ class UsersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/avatar",
-                               value={
-                                "isUrl": False,
-                                "data": "\"" +
-                                        helpers.loadTextFile("tests/img/" +
-                                                             "test_img_n" +
-                                                             "ok_form.txt") +
-                                        "\""
-                               }
+                               value=dict(
+                                isUrl=False,
+                                data="\"" +
+                                     helpers.loadTextFile("tests/img/" +
+                                                          "test_img_n" +
+                                                          "ok_form.txt") +
+                                     "\""
+                               )
                                )
                            )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
@@ -437,14 +461,14 @@ class UsersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/avatar",
-                               value={
-                                "isUrl": False,
-                                "data": "\"" +
-                                        helpers.loadTextFile("tests/img/" +
-                                                             "test_img_n" +
-                                                             "ok_size.txt") +
-                                        "\""
-                               }
+                               value=dict(
+                                isUrl=False,
+                                data="\"" +
+                                     helpers.loadTextFile("tests/img/" +
+                                                          "test_img_n" +
+                                                          "ok_size.txt") +
+                                     "\""
+                               )
                                )
                            )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
@@ -457,10 +481,10 @@ class UsersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/avatar",
-                               value={
-                                "isUrl": False,
-                                "data": "FakeIMG"
-                               }
+                               value=dict(
+                                isUrl=False,
+                                data="FakeIMG"
+                               )
                                )
                            )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
@@ -521,13 +545,13 @@ class UsersTestCase(unittest.TestCase):
                            'testunituser_get_closed',
                            headers={'X-Client-ID': aux_functions.X_Client_ID},
                            json=dict(
-                                   op="rep",
+                                   op="replace",
                                    path="/password",
                                    value="test"
                                    )
                            )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
-        self.assertEqual(-1, r.json["code"])
+        self.assertEqual(-3, r.json["code"])
 
     def test_get_user_sessions_paging_should_return_ok(self):
         r = self.app.get('/api/v1/users/testunituser_get/sessions' +
@@ -542,6 +566,13 @@ class UsersTestCase(unittest.TestCase):
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_user_sessions_paging_invalid_should_return_bad_request(self):
+        r = self.app.get('/api/v1/users/testunituser_get/sessions' +
+                         '?start=a&limit=b',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-1, r.json["code"])
 
 
 if __name__ == '__main__':

@@ -37,6 +37,10 @@ class AdminusersTestCase(unittest.TestCase):
         aux_functions.createAdminTestUser("testunitadminuser_delete", cls)
         # Creamos las sessions a ser utilizadas durante los tests
         aux_functions.createSessionAdmin("testunitadminuser_get", cls)
+        aux_functions.createSessionAdmin("testunitadminuser_get", cls)
+        aux_functions.createSessionAdmin("testunitadminuser_get", cls)
+        aux_functions.createSessionAdmin("testunitadminuser_get", cls)
+        aux_functions.createSessionAdmin("testunitadminuser_get", cls)
         # Cerramos la cuenta del usuario con cuenta cerrada
         aux_functions.closeAccountAdminTestUser("testunitadminuser_get_closed",
                                                 cls)
@@ -139,6 +143,12 @@ class AdminusersTestCase(unittest.TestCase):
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_all_adminusers_paging_invalid_should_return_bad_request(self):
+        r = self.app.get('/api/v1/adminusers?start=a&limit=b',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-1, r.json["code"])
 
     def test_get_non_existing_adminuser_should_return_not_found(self):
         r = self.app.get('/api/v1/adminusers/testunitadminuser_get_not_found',
@@ -290,13 +300,13 @@ class AdminusersTestCase(unittest.TestCase):
                            'testunitadminuser_get_closed',
                            headers={'X-Client-ID': aux_functions.X_Client_ID},
                            json=dict(
-                                   op="rep",
+                                   op="replace",
                                    path="/password",
                                    value="test"
                                    )
                            )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
-        self.assertEqual(-1, r.json["code"])
+        self.assertEqual(-2, r.json["code"])
 
     def test_get_adminuser_sessions_paging_should_return_ok(self):
         r = self.app.get('/api/v1/adminusers/testunitadminuser_get/sessions' +
@@ -311,6 +321,13 @@ class AdminusersTestCase(unittest.TestCase):
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_adminuser_sessions_paging_inv_should_return_bad_request(self):
+        r = self.app.get('/api/v1/adminusers/testunitadminuser_get/sessions' +
+                         '?start=a&limit=b',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-1, r.json["code"])
 
 
 if __name__ == '__main__':

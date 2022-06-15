@@ -32,6 +32,8 @@ class RecoveryTestCase(unittest.TestCase):
         aux_functions.createTestUserService("testunituser_get_service", cls)
         # Creamos los recovery requests a ser utilizados durante los tests
         aux_functions.createRecoveryRequest("testunituser_get", cls)
+        aux_functions.createRecoveryRequest("testunituser_get", cls)
+        aux_functions.createRecoveryRequest("testunituser_post", cls)
         # Cerramos la cuenta del usuario con cuenta cerrada
         aux_functions.closeAccountTestUser("testunituser_post_closed", cls)
 
@@ -106,6 +108,12 @@ class RecoveryTestCase(unittest.TestCase):
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_all_recovery_requests_pag_inv_should_return_bad_request(self):
+        r = self.app.get('/api/v1/recovery?start=a&limit=b',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-1, r.json["code"])
 
     def test_get_recovery_non_existing_user_should_return_not_found(self):
         r = self.app.get('/api/v1/recovery/testunituser_get_not_found',

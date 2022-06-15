@@ -52,11 +52,29 @@ class RequestLogTestCase(unittest.TestCase):
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)
 
-    def test_requestlog_should_return_ok_filter(self):
+    def test_requestlog_should_return_ok_filter_in(self):
         today = str(datetime.utcnow().date())
         r = self.app.get('/api/v1/requestlog?startdate=' + today +
                          '&enddate=' + today +
                          '&filter={"comparator":"in","field":"status",' +
+                         '"value":"200"}',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+
+    def test_requestlog_should_return_bad_request_filter(self):
+        today = str(datetime.utcnow().date())
+        r = self.app.get('/api/v1/requestlog?startdate=' + today +
+                         '&enddate=' + today +
+                         '&filter={"c":"in","f":"status",' +
+                         '"v":"200"}',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+
+    def test_requestlog_should_return_ok_filter_eq(self):
+        today = str(datetime.utcnow().date())
+        r = self.app.get('/api/v1/requestlog?startdate=' + today +
+                         '&enddate=' + today +
+                         '&filter={"comparator":"eq","field":"status",' +
                          '"value":"200"}',
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)

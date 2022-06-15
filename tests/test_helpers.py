@@ -19,7 +19,7 @@ class HelpersTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         app = auth_server.app
-        app.logger.setLevel(logging.ERROR)
+        app.logger.setLevel(logging.CRITICAL)
         app.config['TESTING'] = True
         cls.app = app.test_client()
         print("Starting testing helper methods of the auth server...")

@@ -38,6 +38,10 @@ class SessionsTestCase(unittest.TestCase):
         aux_functions.createAdminTestUser("testunitadminuser_post", cls)
         # Creamos las sessions a ser utilizadas durante los tests
         aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
+        aux_functions.createSession("testunituser_get", cls)
         # Cerramos la cuenta del usuario con cuenta cerrada
         aux_functions.closeAccountTestUser("testunituser_post_closed", cls)
 
@@ -117,6 +121,29 @@ class SessionsTestCase(unittest.TestCase):
                           json=dict(
                               username="testunituser_post_service",
                               password="password"
+                              )
+                          )
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-4, r.json["code"])
+
+    def test_post_session_with_pass_token_should_return_bad_request(self):
+        r = self.app.post('/api/v1/sessions',
+                          headers={'Content-Type': 'application/json',
+                                   'X-Client-ID': aux_functions.X_Client_ID},
+                          json=dict(
+                              username="testunituser_post_service",
+                              password="password",
+                              login_service_token="eyJ0eXAiOiJKV1QiLCJhbGciO" +
+                                                  "iJIUzI1NiJ9.eyJpYXQiOjE2N" +
+                                                  "TUzMDMxNzcsIm5iZiI6MTY1NT" +
+                                                  "MwMzE3NywianRpIjoiMDQ0NDF" +
+                                                  "jYmEtYzZhNS00ZjQ1LWE5N2Yt" +
+                                                  "NmNjOGMxZWFlMTA5IiwiaWRlb" +
+                                                  "nRpdHkiOiJjbG91ZHN5bmNnb2" +
+                                                  "QiLCJmcmVzaCI6ZmFsc2UsInR" +
+                                                  "5cGUiOiJhY2Nlc3MifQ.WBA1C" +
+                                                  "ACXBupn3bPHSfVQ37AuBPLyno" +
+                                                  "a7c2OHG53lSLQ"
                               )
                           )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
@@ -208,6 +235,12 @@ class SessionsTestCase(unittest.TestCase):
                          headers={'X-Client-ID': aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r.status_code)
         self.assertEqual(True, len(r.json) > 0)
+
+    def test_get_all_sessions_paging_invalid_should_return_bad_request(self):
+        r = self.app.get('/api/v1/sessions?start=a&limit=b',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
+        self.assertEqual(-1, r.json["code"])
 
     def test_get_session_invalid_token_user_should_return_unauthorized(self):
         r = self.app.get('/api/v1/sessions/fake-token',
