@@ -38,7 +38,7 @@ services:
       PRUNE_INTERVAL_RECOVERY_SECONDS: 120
       # Configuracion de correo
       SENDMAIL_ACTIVE: "0"
-      SENDMAIL_SERVER: "in-v3.mailjet.com"
+      SENDMAIL_SERVER: "*"
       SENDMAIL_FROM: "*"
       SENDMAIL_PORT: 465
       SENDMAIL_USERNAME: "*"
