@@ -31,12 +31,12 @@ El mismo consiste en la creación de un juego en 2D con mecánicas _roguelike_ c
 
 ### Production (PR)
 [![Build Status](https://app.travis-ci.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer.svg?branch=main)](https://app.travis-ci.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer)
-[![Coverage Status](https://coveralls.io/repos/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer/badge.svg?branch=qa&kill_cache=1)](https://coveralls.io/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer?branch=master&kill_cache=1)  
+[![Coverage Status](https://coveralls.io/repos/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer/badge.svg?branch=qa&kill_cache=1?)](https://coveralls.io/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer?branch=master&kill_cache=1?)  
 https://fiuba-pr-7599-cs-auth-server.herokuapp.com/
 
 ### Quality Assurance (QA)
 [![Build Status](https://app.travis-ci.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer.svg?branch=qa)](https://app.travis-ci.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer)
-[![Coverage Status](https://coveralls.io/repos/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer/badge.svg?branch=qa&kill_cache=1)](https://coveralls.io/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer?branch=qa&kill_cache=1)  
+[![Coverage Status](https://coveralls.io/repos/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer/badge.svg?branch=qa&kill_cache=1?)](https://coveralls.io/github/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer?branch=qa&kill_cache=1?)  
 https://fiuba-qa-7599-cs-auth-server.herokuapp.com/
 
 ### Development (DV - desarrollo local)
