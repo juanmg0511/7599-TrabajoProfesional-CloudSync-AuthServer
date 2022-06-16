@@ -516,6 +516,18 @@ class Session(Resource):
                 except Exception as e:
                     return helpers.handleDatabasebError(e)
 
+                authServer.app.logger.debug(helpers.log_request_id() +
+                                            "Valid session token provided: " +
+                                            "\"" +
+                                            sessionToUpdate["session_token"] +
+                                            "\".")
+                authServer.app.logger.info(helpers.log_request_id() +
+                                           "Valid user \"" +
+                                           sessionToUpdate["username"] +
+                                           "\" session with " +
+                                           sessionToUpdate["user_role"] +
+                                           " privileges.")
+
                 return helpers.return_request(SessionResponseGet,
                                               HTTPStatus.OK)
 
