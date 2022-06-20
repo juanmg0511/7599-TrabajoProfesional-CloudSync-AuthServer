@@ -15,4 +15,4 @@ mongo ${MONGODB_DATABASE} \
         -u ${MONGO_INITDB_ROOT_USERNAME} \
         -p ${MONGO_INITDB_ROOT_PASSWORD} \
         --authenticationDatabase admin \
-        --eval "var defaultAdminUser = { 'username':'cloudsyncgod','password':'$6$rounds=656000$CxPwYVz4B/UhdhUb$.L9KwcTEvk6V1h7.bTbShNdND7d7XqpR2CzFecOu/Jt.YetT/nO24LCjhtH3fEb3MffUFVAIRDATaEXGGUfAT.','first_name':'CloudSync','last_name':'God','email':'cloudsync.god@heaven.org','account_closed':false,'date_created':'2021-10-21T23:33:14.921956','date_updated': null }; db.adminusers.insert(defaultAdminUser);"
+        --eval "var defaultAdminUser = { 'username':'cloudsyncgod','password':'\$6\$rounds=656000\$CxPwYVz4B/UhdhUb\$.L9KwcTEvk6V1h7.bTbShNdND7d7XqpR2CzFecOu/Jt.YetT/nO24LCjhtH3fEb3MffUFVAIRDATaEXGGUfAT.','first_name':'CloudSync','last_name':'God','email':'cloudsync.god@heaven.org','account_closed':false,'date_created':'2021-10-21T23:33:14.921956','date_updated': null }; db.adminusers.insert(defaultAdminUser);"
