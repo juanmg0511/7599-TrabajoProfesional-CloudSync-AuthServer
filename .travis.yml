@@ -4,7 +4,8 @@
 
 # Basado en: https://medium.com/@javierfernandes/continuous-deployment-con-docker-travis-heroku-c24042fb830b
 
-sudo: required
+os: [ "linux" ]
+dist: "xenial"
 language: python
 python:
   - 3.8
