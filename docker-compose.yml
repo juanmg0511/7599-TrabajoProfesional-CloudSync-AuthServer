@@ -67,8 +67,8 @@ services:
       JWT_SECRET: "MINSjxVsRZ6QErNX74wBIUBmm62ExN5"
 
     volumes:
-       - authserverlogs:/home/ubuntu/logs
-       - ".:/home/ubuntu/" 
+       - authserverlogs:/home/appuser/logs
+       - ".:/home/appuser/" 
     ports:
        - "81:8000"
     depends_on:

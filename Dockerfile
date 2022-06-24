@@ -2,37 +2,33 @@
 # Flask + MongoDB - on Gunicorn
 # Dockerfile
 
-# Using Ubuntu's official image, latest LTS version
-FROM ubuntu:20.04
+# Using Alpine's official image, latest version
+FROM alpine:3.16.0
 
-# Avoiding stuck build due to user prompt
-ARG DEBIAN_FRONTEND=noninteractive
-# Installing Python
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y python3 python3-dev python3-venv python3-pip python3-wheel libevent-dev build-essential && \
-	apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Installing Python and other required packages
+RUN apk add --no-cache build-base python3 python3-dev py3-wheel py3-pip jpeg-dev zlib-dev
+
+COPY requirements.txt /root/
+RUN pip install -r /root/requirements.txt
 
 # Preparing container
-# Requirements and directory structure creation
-COPY requirements.txt /root/
-RUN pip install -r /root/requirements.txt && \
-    useradd -m ubuntu && \
-    mkdir /home/ubuntu/logs && \
-    mkdir /home/ubuntu/src && \
-    mkdir /home/ubuntu/tests && \
-    mkdir /home/ubuntu/templates
+# User and directory structure creation
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
+    mkdir /home/appuser/logs && \
+    mkdir /home/appuser/src && \
+    mkdir /home/appuser/tests && \
+    mkdir /home/appuser/templates
 # Creating log file
-RUN touch /home/ubuntu/logs/auth_server.log
+RUN touch /home/appuser/logs/auth_server.log
 # Setting environment
-ENV HOME=/home/ubuntu
-USER ubuntu
+ENV HOME=/home/appuser
+USER appuser
 # Copying files
-COPY auth_server.py gunicorn_config.py /home/ubuntu/
-COPY src /home/ubuntu/src
-COPY templates /home/ubuntu/templates
-COPY tests /home/ubuntu/tests
+COPY auth_server.py gunicorn_config.py /home/appuser/
+COPY src /home/appuser/src
+COPY templates /home/appuser/templates
+COPY tests /home/appuser/tests
 # Configuring network and launching server
-WORKDIR /home/ubuntu/
+WORKDIR /home/appuser/
 EXPOSE 8000
 CMD ["gunicorn", "-c", "gunicorn_config.py", "auth_server:app"]

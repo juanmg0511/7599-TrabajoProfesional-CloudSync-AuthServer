@@ -22,14 +22,14 @@ install:
   # install requirements
   - pip install -U coverage coveralls PyYAML
   # create copy of source code to mirror docker-compose structure
-  - sudo mkdir /home/ubuntu/
-  - sudo find . -name "*.py" -exec rsync -qR {} /home/ubuntu \;
+  - sudo mkdir /home/appuser/
+  - sudo find . -name "*.py" -exec rsync -qR {} /home/appuser \;
   # build dockerized environment to run tests
   - docker-compose build 
   - docker-compose up -d
 script: 
   # unit tests w/coverage, in docker-compose env
-  - docker exec -u root -it auth-server-flask bash -c "coverage run --omit */virtualenv/*,*/usr/* -m unittest tests/*.py -v"
+  - docker exec -u root -it auth-server-flask sh -c "coverage run --omit */virtualenv/*,*/usr/* -m unittest tests/*.py -v"
   - coverage report
 after_success:
   # submit results to coveralls, on success
