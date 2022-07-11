@@ -119,6 +119,7 @@ class AllRecovery(Resource):
             retrievedRecovery = {
                 "id": str(existingRecovery["_id"]),
                 "username": existingRecovery["username"],
+                "email": existingRecovery["email"],
                 "recovery_key": existingRecovery["recovery_key"],
                 "expires":  existingRecovery["expires"],
                 "date_created": existingRecovery["date_created"]
@@ -194,6 +195,7 @@ class AllRecovery(Resource):
 
                     recoveryToInsert = {
                         "username": args["username"],
+                        "email": existingUser["contact"]["email"],
                         "recovery_key": token,
                         "expires": (datetime.utcnow() +
                                     timedelta(
@@ -281,6 +283,7 @@ class Recovery(Resource):
                             RecoveryResponsePost = {
                               "id": str(existingRecovery["_id"]),
                               "username": existingRecovery["username"],
+                              "email": existingRecovery["email"],
                               "recovery_key": existingRecovery["recovery_key"],
                               "expires":  existingRecovery["expires"],
                               "date_created": existingRecovery["date_created"]
