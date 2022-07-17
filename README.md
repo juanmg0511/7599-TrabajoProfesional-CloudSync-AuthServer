@@ -45,6 +45,7 @@ https://fiuba-qa-7599-cs-auth-server.herokuapp.com/
 - Ejecutar en el root del repositorio: `docker-compose build`
 - Ejecutar en el root del repositorio: `docker-compose up`
 - El server estrá disponible en: **127.0.0.1:81**
+- El server cuenta con MailHog para testear la funcionalidad de envio de correos. La web estará disponible en: **127.0.0.1:8025**
 
 #### Tests
 

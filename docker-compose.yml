@@ -2,6 +2,9 @@
 # Flask + MongoDB - on Gunicorn
 # docker-compose.yml
 
+# Configuracion de MailHog basada en:
+# https://mailtrap.io/blog/mailhog-explained
+
 version: '3'
 services:
 
@@ -37,14 +40,14 @@ services:
       # Setear el intervalo de limpieza de recovery, en segundos
       PRUNE_INTERVAL_RECOVERY_SECONDS: 120
       # Configuracion de correo
-      SENDMAIL_ACTIVE: "0"
-      SENDMAIL_SERVER: "*"
-      SENDMAIL_FROM: "*"
-      SENDMAIL_PORT: 465
+      SENDMAIL_ACTIVE: "1"
+      SENDMAIL_SERVER: "auth-server-mailhog"
+      SENDMAIL_FROM: "do-not-reply@cloudsync.com"
+      SENDMAIL_PORT: 1025
       SENDMAIL_USERNAME: "*"
       SENDMAIL_PASSWORD: "*"
       SENDMAIL_USE_TLS: "0"
-      SENDMAIL_USE_SSL: "1"
+      SENDMAIL_USE_SSL: "0"
       SENDMAIL_BASE_URL: "http://127.0.0.1"
       # Dimensiones para las imagenes de avatar
       # Ancho, en pixeles
@@ -74,8 +77,8 @@ services:
     depends_on:
       - mongodb
     networks:
-      - frontend
-      - backend
+      - auth-frontend
+      - auth-backend
 
   mongodb:
     image: mongo:5.0.9
@@ -99,12 +102,22 @@ services:
     # ports:
        # - "27017:27017"
     networks:
-      - backend
+      - auth-backend
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: auth-server-mailhog
+    restart: unless-stopped
+    ports:
+      - 8025:8025
+    networks:
+      - auth-frontend
+      - auth-backend
 
 networks:
-  frontend:
+  auth-frontend:
     driver: bridge
-  backend:
+  auth-backend:
     driver: bridge
 
 volumes:
