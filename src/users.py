@@ -266,23 +266,23 @@ class AllUsers(Resource):
 
         authServer.app.logger.info(helpers.log_request_id() +
                                    "New user '" +
-                                   args["username"] +
+                                   str.lower(args["username"]) +
                                    "' requested.")
 
         try:
             existingUser = \
                 authServer.db.users.find_one(
-                    {"username": args["username"]})
+                    {"username": str.lower(args["username"])})
             existingAdminUser = \
                 authServer.db.adminusers.find_one(
-                    {"username": args["username"]})
+                    {"username": str.lower(args["username"])})
         except Exception as e:
             return helpers.handleDatabasebError(e)
         if ((existingUser is not None) or (existingAdminUser is not None)):
             UserResponsePost = {
                 "code": -5,
                 "message": "Bad request. User '" +
-                           args["username"] +
+                           str.lower(args["username"]) +
                            "' already exists.",
                 "data": None
             }
@@ -290,7 +290,7 @@ class AllUsers(Resource):
                                           HTTPStatus.BAD_REQUEST)
 
         userToInsert = {
-            "username": args["username"],
+            "username": str.lower(args["username"]),
             "first_name": args["first_name"],
             "last_name": args["last_name"],
             "contact": {
@@ -365,6 +365,9 @@ class User(Resource):
     @helpers.require_apikey
     @helpers.log_reqId
     def put(self, username):
+
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
         authServer.app.logger.info(helpers.log_request_id() +
                                    "User '" +
                                    username +
@@ -489,6 +492,9 @@ class User(Resource):
     @helpers.require_apikey
     @helpers.log_reqId
     def patch(self, username):
+
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
         authServer.app.logger.info(helpers.log_request_id() +
                                    "Password or Avatar " +
                                    "modification for user '" +
@@ -596,6 +602,9 @@ class User(Resource):
     @helpers.require_apikey
     @helpers.log_reqId
     def delete(self, username):
+
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
         authServer.app.logger.info(helpers.log_request_id() +
                                    "User '" +
                                    username +
@@ -653,6 +662,9 @@ class UserSessions(Resource):
     @helpers.require_apikey
     @helpers.log_reqId
     def get(self, username):
+
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
         authServer.app.logger.info(helpers.log_request_id() + "User '" +
                                    username + "' sessions requested.")
 

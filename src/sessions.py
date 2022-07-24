@@ -169,7 +169,7 @@ class AllSessions(Resource):
 
         authServer.app.logger.info(helpers.log_request_id() +
                                    "New session for user '" +
-                                   args["username"] +
+                                   str.lower(args["username"]) +
                                    "' requested.")
 
         # Vemos si el usuario es un admin o no
@@ -188,14 +188,16 @@ class AllSessions(Resource):
         if (isAdmin is True):
             try:
                 existingAdminUser = authServer.db.adminusers.find_one(
-                                        {"username": args["username"]}
+                                        {"username":
+                                            str.lower(args["username"])}
                                     )
             except Exception as e:
                 return helpers.handleDatabasebError(e)
         else:
             try:
                 existingUser = authServer.db.users.find_one(
-                                        {"username": args["username"]}
+                                        {"username":
+                                            str.lower(args["username"])}
                                     )
             except Exception as e:
                 return helpers.handleDatabasebError(e)
@@ -240,7 +242,8 @@ class AllSessions(Resource):
                         authServer.app.logger.debug(helpers.log_request_id() +
                                                     "Checking valid login" +
                                                     " for user '" +
-                                                    args["username"] +
+                                                    str.lower(
+                                                        args["username"]) +
                                                     "' with external service.")
                         try:
                             # Specify the CLIENT_ID of the app that accesses
@@ -367,7 +370,8 @@ class AllSessions(Resource):
                     # Como manejamos sesiones stateful, el venicimiento se
                     # guarda en el servidor
                     try:
-                        token = create_access_token(identity=args["username"],
+                        token = create_access_token(identity=str.lower(
+                                                        args["username"]),
                                                     expires_delta=False)
                     except Exception:
                         SessionResponsePost = {
@@ -380,7 +384,7 @@ class AllSessions(Resource):
                             HTTPStatus.SERVICE_UNAVAILABLE)
 
                     sessionToInsert = {
-                        "username": args["username"],
+                        "username": str.lower(args["username"]),
                         "user_role": "admin" if isAdmin else "user",
                         "session_token": token,
                         "expires": expiry_time,
@@ -413,7 +417,8 @@ class AllSessions(Resource):
 
             SessionResponsePost = {
                 "code": -2,
-                "message": "Bad request. Account '" + args["username"] +
+                "message": "Bad request. Account '" +
+                           str.lower(args["username"]) +
                            "' is closed.",
                 "data": None
             }
@@ -422,7 +427,9 @@ class AllSessions(Resource):
 
         SessionResponsePost = {
             "code": -4,
-            "message": "User '" + args["username"] + "' not found.",
+            "message": "User '" +
+                       str.lower(args["username"]) +
+                       "' not found.",
             "data": None
         }
         return helpers.return_request(SessionResponsePost,

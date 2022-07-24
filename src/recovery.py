@@ -158,11 +158,12 @@ class AllRecovery(Resource):
 
         authServer.app.logger.info(helpers.log_request_id() +
                                    "New password recovery request for user '" +
-                                   args["username"] + "' requested.")
+                                   str.lower(args["username"]) +
+                                   "' requested.")
 
         try:
             existingUser = authServer.db.users.find_one(
-                                {"username": args["username"]})
+                                {"username": str.lower(args["username"])})
         except Exception as e:
             return helpers.handleDatabasebError(e)
         if (existingUser is not None):
@@ -170,10 +171,12 @@ class AllRecovery(Resource):
                 if (existingUser["login_service"] is False):
                     try:
                         existingRecovery = authServer.db.recovery.find_one(
-                                            {"username": args["username"]})
+                                            {"username":
+                                                str.lower(args["username"])})
                         if (existingRecovery is not None):
                             authServer.db.recovery.delete_one(
-                                            {"username": args["username"]})
+                                            {"username":
+                                                str.lower(args["username"])})
                     except Exception as e:
                         return helpers.handleDatabasebError(e)
 
@@ -181,7 +184,8 @@ class AllRecovery(Resource):
                     # Como manejamos sesiones stateful, el venicimiento se
                     # guarda en el servidor
                     try:
-                        token = create_access_token(identity=args["username"],
+                        token = create_access_token(identity=str.lower(
+                                                        args["username"]),
                                                     expires_delta=False)
                     except Exception:
                         SessionResponsePost = {
@@ -194,7 +198,7 @@ class AllRecovery(Resource):
                             HTTPStatus.SERVICE_UNAVAILABLE)
 
                     recoveryToInsert = {
-                        "username": args["username"],
+                        "username": str.lower(args["username"]),
                         "email": existingUser["contact"]["email"],
                         "recovery_key": token,
                         "expires": (datetime.utcnow() +
@@ -221,7 +225,7 @@ class AllRecovery(Resource):
 
                 RecoveryResponsePost = {
                    "code": -3,
-                   "message": "User '" + args["username"] +
+                   "message": "User '" + str.lower(args["username"]) +
                               "' uses a login service, " +
                               "can't recover password.",
                    "data:": None
@@ -232,7 +236,7 @@ class AllRecovery(Resource):
             RecoveryResponsePost = {
                     "code": -2,
                     "message": "Bad request. Account '" +
-                               args["username"] +
+                               str.lower(args["username"]) +
                                "' is closed.",
                     "data": None
             }
@@ -241,7 +245,7 @@ class AllRecovery(Resource):
 
         RecoveryResponsePost = {
             "code": -1,
-            "message": "User '" + args["username"] + "' not found.",
+            "message": "User '" + str.lower(args["username"]) + "' not found.",
             "data": None
         }
         return helpers.return_request(RecoveryResponsePost,
@@ -258,6 +262,9 @@ class Recovery(Resource):
     @helpers.require_apikey
     @helpers.log_reqId
     def get(self, username):
+
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
         authServer.app.logger.info(helpers.log_request_id() +
                                    "Password recovery request for username '"
                                    + username +
@@ -343,6 +350,9 @@ class Recovery(Resource):
     @helpers.require_apikey
     @helpers.log_reqId
     def post(self, username):
+
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
         try:
             parser = reqparse.RequestParser()
             parser.add_argument("recovery_key",
