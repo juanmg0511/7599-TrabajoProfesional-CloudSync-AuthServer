@@ -23,6 +23,8 @@ import math
 from PIL import Image
 # Validators, para la validacion de mails y URLs
 import validators
+# Python-Usernames, para la validacion de nombres de usuario
+from usernames import is_safe_username
 # Wraps, para implementacion de decorators
 from functools import wraps
 
@@ -285,7 +287,7 @@ def log_request_id():
 
 # Funcion que chequea si un string esta vacio
 def non_empty_string(s):
-    if not s:
+    if ((not s) or (str.isspace(s))):
         raise ValueError("Must not be empty string.")
     return s
 
@@ -354,6 +356,29 @@ def non_empty_image(i):
                              "maximum allowed values.")
     else:
         raise ValueError("Image must be in jpg or png format.")
+
+
+# Funcion que chequea si un nombre de usario es valido
+#
+# https://pypi.org/project/python-usernames/
+#
+# Provides a default regex validator.
+# Validates against list of banned words that should not be used as username.
+#
+# The default regular expression is as follows:
+# ^                  beginning of string
+# (?!_$)             no only _
+# (?![-.])           no - or . at the beginning
+# (?!.*[_.-]{2})     no __ or _. or ._ or .. or -- inside
+# [a-zA-Z0-9_.-]+    allowed characters, atleast one must be present
+# (?<![.-])          no - or . at the end
+# $                  end of string
+def non_empty_and_safe_username(u):
+    if is_safe_username(u,
+                        max_length=int(
+                            authServer.username_max_length)) is False:
+        raise ValueError("Invalid username.")
+    return u
 
 
 # Funcion que envia el correo de recupero de contraseña

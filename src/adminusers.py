@@ -164,7 +164,8 @@ class AllAdminUsers(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument("username", type=helpers.non_empty_string,
+            parser.add_argument("username",
+                                type=helpers.non_empty_and_safe_username,
                                 required=True, nullable=False)
             parser.add_argument("password", type=helpers.non_empty_string,
                                 required=True, nullable=False)
@@ -269,7 +270,7 @@ class AdminUser(Resource):
         }
         return helpers.return_request(UserResponseGet, HTTPStatus.NOT_FOUND)
 
-    # verbo PUT - actualizar usuario completo, si no existe lo crea
+    # verbo PUT - actualizar usuario administrador completo (sin contrasenia)
     @helpers.require_apikey
     @helpers.log_reqId
     def put(self, username):

@@ -57,6 +57,7 @@ sendmail_password_default = None
 sendmail_tls_default = "0"
 sendmail_ssl_default = "0"
 sendmail_base_url_default = "http://127.0.0.1"
+username_max_length_default = 25
 avatar_max_width_default = 256
 avatar_max_height_default = 256
 avatar_max_size_default = 524288
@@ -142,6 +143,9 @@ prune_interval_sessions = \
 prune_interval_recovery = \
                         os.environ.get("PRUNE_INTERVAL_RECOVERY_SECONDS",
                                        prune_interval_recovery_seconds_default)
+# Lectura de la longitud maxima para usernames
+username_max_length = os.environ.get("USERNAME_MAX_LENGTH",
+                                     username_max_length_default)
 # Lectura de las dimensiones para las imagenes de avatar
 avatar_max_width = os.environ.get("AVATAR_MAX_WIDTH",
                                   avatar_max_width_default)
