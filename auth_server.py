@@ -24,6 +24,8 @@ from flask_pymongo import PyMongo
 from flask_jwt_extended import JWTManager
 # Flask-APScheduler para el prune de la collection de sesiones
 from apscheduler.schedulers.background import BackgroundScheduler
+# Flask-Talisman para el manejo de SSL
+from flask_talisman import Talisman
 
 # Importacion de clases necesarias
 from src import home, adminusers, users, sessions, recovery, \
@@ -288,6 +290,11 @@ api.add_resource(recovery.Recovery,
 api.add_resource(requestlog.RequestLog,
                  api_path + "/requestlog")
 
+# Wrappeamos con Talisman a la aplicacion Flask
+# Solo permitimos http para el ambiente de desarrollo
+Talisman(app,
+         force_https=(False if app_env == "DEV" else True),
+         content_security_policy=None)
 
 # Inicio del server en forma directa con WSGI
 # Toma el puerto y modo de las variables de entorno
