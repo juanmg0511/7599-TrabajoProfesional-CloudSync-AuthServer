@@ -19,6 +19,8 @@ from flask_jwt_extended import decode_token
 # Passlib para encriptar contrasenias
 from passlib.apps import custom_app_context
 
+# Importacion de las configuracion del Auth Server
+import auth_server_config as config
 # Importacion del archivo principal y helpers
 import auth_server as authServer
 from src import helpers
@@ -204,7 +206,7 @@ class AllRecovery(Resource):
                         "expires": (datetime.utcnow() +
                                     timedelta(
                                         minutes=int(
-                                            authServer.recovery_length
+                                            config.recovery_length
                                         )
                                     )).isoformat(),
                         "date_created": datetime.utcnow().isoformat()
@@ -423,9 +425,23 @@ class Recovery(Resource):
                                existingRecovery["recovery_key"]):
 
                                 # Cambia la password
-                                existingUser["password"] = \
-                                    custom_app_context.hash(
-                                        args["new_password"])
+                                try:
+                                    existingUser["password"] = \
+                                        custom_app_context.\
+                                        hash(
+                                            helpers.
+                                            non_empty_and_valid_password(
+                                                args["new_password"]))
+                                except Exception:
+                                    userResponsePatch = {
+                                        "code": -1,
+                                        "message": "Invalid password.",
+                                        "data:": None
+                                    }
+                                    return helpers.\
+                                        return_request(userResponsePatch,
+                                                       HTTPStatus.BAD_REQUEST)
+
                                 existingUser["date_updated"] = \
                                     datetime.utcnow().isoformat()
                                 try:

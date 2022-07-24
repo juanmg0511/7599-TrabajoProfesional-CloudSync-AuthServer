@@ -30,6 +30,8 @@ from password_validator import PasswordValidator
 # Wraps, para implementacion de decorators
 from functools import wraps
 
+# Importacion de las configuracion del Auth Server
+import auth_server_config as config
 # Importacion del archivo principal
 import auth_server as authServer
 
@@ -45,7 +47,7 @@ def require_apikey(view_function):
         if request.headers.get("X-Client-ID") \
            and \
            request.headers.get("X-Client-ID") \
-           == authServer.api_key:
+           == config.api_key:
             authServer.app.logger.debug(log_request_id() + "Authorized.")
             return view_function(*args, **kwargs)
         else:
@@ -93,48 +95,48 @@ def handleDatabasebError(e):
 # Funcion que loguea los parametros configurados en variables de entorno
 def config_log():
 
-    if (authServer.app_env != "PROD"):
+    if (config.app_env != "PROD"):
         authServer.app.logger.warning("**************************************")
         authServer.app.logger.warning("* This server is: " +
-                                      authServer.app_env)
+                                      config.app_env)
         authServer.app.logger.warning("**************************************")
 
     authServer.app.logger.info("Database server: " +
-                               authServer.mongodb_hostname)
+                               config.mongodb_hostname)
     authServer.app.logger.debug("Database name: " +
-                                authServer.mongodb_database)
+                                config.mongodb_database)
     authServer.app.logger.debug("Database username: " +
-                                authServer.mongodb_username)
+                                config.mongodb_username)
     authServer.app.logger.debug("Database using SSL: " +
-                                authServer.mongodb_ssl)
+                                config.mongodb_ssl)
     authServer.app.logger.info("Database replica set: " +
-                               authServer.mongodb_replica_set)
+                               config.mongodb_replica_set)
     authServer.app.logger.debug("Database auth source: " +
-                                authServer.mongodb_auth_source)
+                                config.mongodb_auth_source)
 
-    if (authServer.api_key == authServer.api_key_default):
+    if (config.api_key == config.api_key_default):
         authServer.app.logger.warning("API key not set, please verify " +
                                       "\"APP_SERVER_API_KEY\". Using " +
                                       "default value.")
     authServer.app.logger.debug("API key is: \"" +
-                                str(authServer.api_key) +
+                                str(config.api_key) +
                                 "\".")
     authServer.app.logger.info("Session length for users is: " +
-                               str(authServer.session_length_user) +
+                               str(config.session_length_user) +
                                " minutes.")
     authServer.app.logger.info("Session length for admins is: " +
-                               str(authServer.session_length_admin) +
+                               str(config.session_length_admin) +
                                " minutes.")
     authServer.app.logger.info("Recovery length is: " +
-                               str(authServer.recovery_length) +
+                               str(config.recovery_length) +
                                " minutes.")
     authServer.app.logger.info("Prune interval for sessions is: " +
-                               str(authServer.prune_interval_sessions) +
+                               str(config.prune_interval_sessions) +
                                " seconds.")
     authServer.app.logger.info("Prune interval for recovery is: " +
-                               str(authServer.prune_interval_recovery) +
+                               str(config.prune_interval_recovery) +
                                " seconds.")
-    if (authServer.mail_active is False):
+    if (config.sendmail_active is False):
         authServer.app.logger.warning("Send mail functionality is DISABLED. " +
                                       "Please enable \"SENDMAIL_ACTIVE\".")
     authServer.app.logger.info("Mail server: \"" +
@@ -150,25 +152,25 @@ def config_log():
                                str(authServer.app.config["MAIL_USE_SSL"]) +
                                ".")
     authServer.app.logger.info("Recovery base URL: \"" +
-                               str(authServer.mail_base_url) +
+                               str(config.sendmail_base_url) +
                                "\".")
-    if (authServer.google_client_id is None):
+    if (config.google_client_id is None):
         authServer.app.logger.warning("Google login incorrectly " +
                                       "configured. " +
                                       "Please check settings!")
     else:
         authServer.app.logger.info("Google login configured.")
         authServer.app.logger.info("Client ID: \"" +
-                                   authServer.google_client_id +
+                                   config.google_client_id +
                                    "\".")
     authServer.app.logger.debug("Max avatar width is: \"" +
-                                str(authServer.avatar_max_width) +
+                                str(config.avatar_max_width) +
                                 "\" pixels.")
     authServer.app.logger.debug("Max avatar height is: \"" +
-                                str(authServer.avatar_max_height) +
+                                str(config.avatar_max_height) +
                                 "\" pixels.")
     authServer.app.logger.debug("Max avatar size is: \"" +
-                                str(authServer.avatar_max_size) +
+                                str(config.avatar_max_size) +
                                 "\" Bytes.")
 
     return 0
@@ -208,7 +210,7 @@ def prune_sessions():
         "log_type": "task",
         "request_date": datetime.utcnow().isoformat(),
         "task_type": "prune expired sessions",
-        "api_version": "v" + authServer.api_version,
+        "api_version": "v" + config.api_version,
         "pruned_sessions": sessionDeleted
     }
     try:
@@ -256,7 +258,7 @@ def prune_recovery():
         "log_type": "task",
         "request_date": datetime.utcnow().isoformat(),
         "task_type": "prune expired recovery requests",
-        "api_version": "v" + authServer.api_version,
+        "api_version": "v" + config.api_version,
         "pruned_requests": recoveryDeleted
     }
     try:
@@ -351,11 +353,11 @@ def non_empty_image(i):
     if img.format.lower() in ["jpg", "jpeg", "png"]:
         # Validacion de ancho y alto
         width, height = img.size
-        if (width <= int(authServer.avatar_max_width)
-           and height <= int(authServer.avatar_max_height)):
+        if (width <= int(config.avatar_max_width)
+           and height <= int(config.avatar_max_height)):
             # Validacion de tamanio
             fileSize = math.ceil(len(i) / 4) * 3
-            if (fileSize <= int(authServer.avatar_max_size)):
+            if (fileSize <= int(config.avatar_max_size)):
                 return i
             else:
                 raise ValueError("Image size exceeds the " +
@@ -385,7 +387,7 @@ def non_empty_image(i):
 def non_empty_and_safe_username(u):
     if is_safe_username(u,
                         max_length=int(
-                            authServer.username_max_length)) is False:
+                            config.username_max_length)) is False:
         raise ValueError("Invalid username.")
     return u
 
@@ -431,17 +433,17 @@ def non_empty_and_valid_password(p):
     # no se pueden agregar condiciones dinamicamente al objeto.
     passwordSchema = PasswordValidator()
     passwordSchemaStr = "passwordSchema" + \
-                        ".min(int(authServer.password_policy[\"min\"]))" + \
-                        ".max(int(authServer.password_policy[\"max\"]))"
-    if (authServer.password_policy["digits"] in ["True", "true", True]):
+                        ".min(int(config.password_policy[\"min\"]))" + \
+                        ".max(int(config.password_policy[\"max\"]))"
+    if (config.password_policy["digits"] in ["True", "true", True]):
         passwordSchemaStr += ".has().digits()"
-    if (authServer.password_policy["letters"] in ["True", "true", True]):
+    if (config.password_policy["letters"] in ["True", "true", True]):
         passwordSchemaStr += ".has().letters()"
-    if (authServer.password_policy["uppercase"] in ["True", "true", True]):
+    if (config.password_policy["uppercase"] in ["True", "true", True]):
         passwordSchemaStr += ".has().uppercase()"
-    if (authServer.password_policy["lowercase"] in ["True", "true", True]):
+    if (config.password_policy["lowercase"] in ["True", "true", True]):
         passwordSchemaStr += ".has().lowercase()"
-    if (authServer.password_policy["symbols"] in ["True", "true", True]):
+    if (config.password_policy["symbols"] in ["True", "true", True]):
         passwordSchemaStr += ".has().symbols()"
     passwordSchemaStr += ".has().no().spaces()"
 
@@ -463,7 +465,7 @@ def send_recovery_notification(user, recovery_key, force_send=False):
                                "\" at \"" +
                                str(user["contact"]["email"]) + "\".")
 
-    if (authServer.mail_active is False and force_send is False):
+    if (config.sendmail_active is False and force_send is False):
         authServer.app.logger.warning(log_request_id() +
                                       "Send mail functionality is " +
                                       "DISABLED. Please enable " +
@@ -472,21 +474,21 @@ def send_recovery_notification(user, recovery_key, force_send=False):
                                       "Mail not sent.")
         return -1
 
-    if authServer.app_env == "QA":
+    if config.app_env == "QA":
         subject = "CloudSync [Quality Assurance]"
-    elif authServer.app_env == "PROD":
+    elif config.app_env == "PROD":
         subject = "CloudSync"
     else:
         subject = "CloudSync [Development]"
     msg = Message(subject + ": password recovery request",
-                  sender=("CloudSync Admin", authServer.mail_from),
+                  sender=("CloudSync Admin", config.sendmail_from),
                   reply_to="no-reply@cloudsync.com",
                   recipients=[str(user["contact"]["email"])])
 
     msg.html = authServer.\
         mail_template.\
         replace("wwww://wwwww-wwwwww-w-www-wwwww.wwwwwwwww.www",
-                authServer.mail_base_url).\
+                config.sendmail_base_url).\
         replace("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
                 recovery_key)
     message = "Mail dispatched successfully."
@@ -506,7 +508,7 @@ def send_recovery_notification(user, recovery_key, force_send=False):
             "log_type": "mail",
             "request_date": datetime.utcnow().isoformat(),
             "request_id": current_request_id(),
-            "api_version": "v" + authServer.api_version,
+            "api_version": "v" + config.api_version,
             "username": user["username"],
             "email": str(user["contact"]["email"]),
             "recovery_key": recovery_key,

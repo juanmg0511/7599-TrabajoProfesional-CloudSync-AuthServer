@@ -190,7 +190,7 @@ class RecoveryTestCase(unittest.TestCase):
                                     'X-Client-ID': aux_functions.X_Client_ID},
                            json=dict(
                                recovery_key=r1.json["recovery_key"],
-                               new_password="test"
+                               new_password="123456"
                                )
                            )
         self.assertEqual(HTTPStatus.OK, r2.status_code)

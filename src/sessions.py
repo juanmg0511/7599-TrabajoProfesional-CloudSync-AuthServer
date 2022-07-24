@@ -27,6 +27,8 @@ from google.auth.transport import requests
 # Passlib para encriptar contrasenias
 from passlib.apps import custom_app_context
 
+# Importacion de las configuracion del Auth Server
+import auth_server_config as config
 # Importacion del archivo principal y helpers
 import auth_server as authServer
 from src import helpers
@@ -250,7 +252,7 @@ class AllSessions(Resource):
                             # the backend:
                             idinfo = id_token.verify_oauth2_token(
                                 token, requests.Request(),
-                                authServer.google_client_id)
+                                config.google_client_id)
 
                             # Or, if multiple clients access the
                             # backend server:
@@ -354,7 +356,7 @@ class AllSessions(Resource):
                             datetime.utcnow() +
                             timedelta(
                                 minutes=int(
-                                    authServer.session_length_admin)
+                                    config.session_length_admin)
                                 )
                             ).isoformat()
                     else:
@@ -362,7 +364,7 @@ class AllSessions(Resource):
                             datetime.utcnow() +
                             timedelta(
                                 minutes=int(
-                                    authServer.session_length_user)
+                                    config.session_length_user)
                                 )
                             ).isoformat()
 
@@ -496,7 +498,7 @@ class Session(Resource):
                         datetime.utcnow() +
                         timedelta(
                             minutes=int(
-                                authServer.session_length_admin)
+                                config.session_length_admin)
                             )
                         ).isoformat()
                 else:
@@ -504,7 +506,7 @@ class Session(Resource):
                         datetime.utcnow() +
                         timedelta(
                             minutes=int(
-                                authServer.session_length_user)
+                                config.session_length_user)
                             )
                         ).isoformat()
 

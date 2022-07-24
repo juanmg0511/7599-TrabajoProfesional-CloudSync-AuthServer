@@ -3,12 +3,14 @@
 # Unit test file, funciones auxiliares
 # tests/aux_functions.py
 
+# Importacion de las configuracion del Auth Server
+import auth_server_config as config
 # Importacion del archivo principal
 import auth_server
 
 # Toma el api key del auth server
 # Se puede usar otro si así se desea
-X_Client_ID = auth_server.api_key
+X_Client_ID = config.api_key
 
 
 # Crea un usuario de prueba, sin usar la API
