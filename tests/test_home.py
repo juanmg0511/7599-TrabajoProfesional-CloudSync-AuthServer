@@ -65,6 +65,9 @@ class HomeTestCase(unittest.TestCase):
         self.assertEqual('online', r.json['data']['server_status'])
         self.assertEqual('online', r.json['data']['database_status'])
 
+    def test_on_starting_should_return_ok(self):
+        auth_server.on_starting(None)
+
 
 if __name__ == '__main__':
     unittest.main()
