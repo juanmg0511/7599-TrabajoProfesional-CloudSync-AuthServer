@@ -363,7 +363,7 @@ class AdminUser(Resource):
             parser.add_argument("path", type=helpers.non_empty_string,
                                 required=True, nullable=False,
                                 choices=['/password'])
-            parser.add_argument("value", type=helpers.non_empty_string,
+            parser.add_argument("value", type=helpers.non_empty_argument,
                                 required=True, nullable=False)
             args = parser.parse_args()
         except Exception:

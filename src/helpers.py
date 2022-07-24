@@ -289,9 +289,16 @@ def log_request_id():
 
 # Funcion que chequea si un string esta vacio
 def non_empty_string(s):
-    if not s:
+    if ((not s) or (str.isspace(s))):
         raise ValueError("Must not be empty string.")
     return s
+
+
+# Funcion que chequea si un argumento esta vacio
+def non_empty_argument(a):
+    if not a:
+        raise ValueError("Must not be empty.")
+    return a
 
 
 # Funcion que chequea si una fecha es valida
