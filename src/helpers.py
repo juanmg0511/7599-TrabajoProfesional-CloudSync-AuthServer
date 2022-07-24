@@ -25,6 +25,8 @@ from PIL import Image
 import validators
 # Python-Usernames, para la validacion de nombres de usuario
 from usernames import is_safe_username
+# Password-Validator, para la validacion de contrasenias
+from password_validator import PasswordValidator
 # Wraps, para implementacion de decorators
 from functools import wraps
 
@@ -287,7 +289,7 @@ def log_request_id():
 
 # Funcion que chequea si un string esta vacio
 def non_empty_string(s):
-    if ((not s) or (str.isspace(s))):
+    if not s:
         raise ValueError("Must not be empty string.")
     return s
 
@@ -379,6 +381,70 @@ def non_empty_and_safe_username(u):
                             authServer.username_max_length)) is False:
         raise ValueError("Invalid username.")
     return u
+
+
+# Funcion que chequea si una contrasenia es valida
+#
+# https://pypi.org/project/password-validator/
+#
+# Rules supported as of now are:
+# digits()	    specifies password must include digits
+# letters()	    specifies password must include letters
+# lowercase()	specifies password must include lowercase letters
+# uppercase()	specifies password must include uppercase letters
+# symbols()	    specifies password must include symbols
+# spaces()	    specifies password must include spaces
+# min(len)	    specifies minimum length
+# max(len)	    specifies maximum length
+
+# Create a schema
+# schema = PasswordValidator()
+#
+# Add properties to it
+# schema\
+# .min(8)\
+# .max(100)\
+# .has().uppercase()\
+# .has().lowercase()\
+# .has().digits()\
+# .has().no().spaces()\
+#
+# Validate against a password string
+# print(schema.validate('validPASS123'));
+# => True
+# print(schema.validate('invalidPASS'));
+# => False
+def non_empty_and_valid_password(p):
+
+    # Instanciacion y configuracion de la politica de
+    # contrasenias. Por default no se permiten passwords con
+    # espacios.
+    #
+    # Hay que armarlo como string y ejecutarlo una sola vez porque
+    # no se pueden agregar condiciones dinamicamente al objeto.
+    passwordSchema = PasswordValidator()
+    passwordSchemaStr = "passwordSchema" + \
+                        ".min(int(authServer.password_policy[\"min\"]))" + \
+                        ".max(int(authServer.password_policy[\"max\"]))"
+    if (authServer.password_policy["digits"] in ["True", "true", True]):
+        passwordSchemaStr += ".has().digits()"
+    if (authServer.password_policy["letters"] in ["True", "true", True]):
+        passwordSchemaStr += ".has().letters()"
+    if (authServer.password_policy["uppercase"] in ["True", "true", True]):
+        passwordSchemaStr += ".has().uppercase()"
+    if (authServer.password_policy["lowercase"] in ["True", "true", True]):
+        passwordSchemaStr += ".has().lowercase()"
+    if (authServer.password_policy["symbols"] in ["True", "true", True]):
+        passwordSchemaStr += ".has().symbols()"
+    passwordSchemaStr += ".has().no().spaces()"
+
+    # Ejecucion de la sentencia, a fin de configurar la politica
+    exec(passwordSchemaStr)
+
+    # Chequeo del valor ingresado y devolucion de resultado
+    if passwordSchema.validate(p) is False:
+        raise ValueError("Invalid password.")
+    return p
 
 
 # Funcion que envia el correo de recupero de contraseña

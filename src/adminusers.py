@@ -167,7 +167,8 @@ class AllAdminUsers(Resource):
             parser.add_argument("username",
                                 type=helpers.non_empty_and_safe_username,
                                 required=True, nullable=False)
-            parser.add_argument("password", type=helpers.non_empty_string,
+            parser.add_argument("password",
+                                type=helpers.non_empty_and_valid_password,
                                 required=True, nullable=False)
             parser.add_argument("first_name", type=helpers.non_empty_string,
                                 required=True, nullable=False)
@@ -382,6 +383,21 @@ class AdminUser(Resource):
             return helpers.handleDatabasebError(e)
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
+
+                try:
+                    existingUser["password"] = \
+                        custom_app_context.\
+                        hash(helpers.non_empty_and_valid_password(
+                            args["value"]))
+                except Exception:
+                    userResponsePatch = {
+                        "code": -1,
+                        "message": "Invalid password.",
+                        "data:": None
+                    }
+                    return helpers.\
+                        return_request(userResponsePatch,
+                                       HTTPStatus.BAD_REQUEST)
 
                 existingUser["password"] = custom_app_context.hash(
                     args["value"])

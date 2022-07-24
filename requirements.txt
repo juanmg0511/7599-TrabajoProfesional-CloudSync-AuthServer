@@ -15,6 +15,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 MarkupSafe==1.1.1
 passlib==1.7.2
+password-validator==1.0
 Pillow==9.1.1
 python-usernames==0.3.1
 Validators==0.19.0

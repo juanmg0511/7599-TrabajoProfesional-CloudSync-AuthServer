@@ -236,7 +236,7 @@ class AdminusersTestCase(unittest.TestCase):
                            json=dict(
                                op="replace",
                                path="/password",
-                               value="test"
+                               value="12345"
                                )
                            )
         self.assertEqual(HTTPStatus.OK, r.status_code)

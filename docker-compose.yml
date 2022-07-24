@@ -50,7 +50,24 @@ services:
       SENDMAIL_USE_SSL: "0"
       SENDMAIL_BASE_URL: "http://127.0.0.1"
       # Longitud maxima para nombres de usuarios
-      USERNAME_MAX_LENGTH: 25
+      USERNAME_MAX_LENGTH: 64
+      # Politica de contrasenias
+      # True es al menos uno
+      # False es libre
+      # Caracteres minimos
+      PASSWORD_POLICY_MIN: 5
+      # Caracteres maximos
+      PASSWORD_POLICY_MAX: 256
+      # Debe contener numeros
+      PASSWORD_POLICY_DIGITS: "False"
+      # Debe contener letras
+      PASSWORD_POLICY_LETTERS: "False"
+      # Debe contener letras minusculas
+      PASSWORD_POLICY_LOWERCASE: "False"
+      # Debe contener letras mayucsulas
+      PASSWORD_POLICY_UPPERCASE: "False"
+      # Debe contener simbolos
+      PASSWORD_POLICY_SYMBOLS: "False"
       # Dimensiones para las imagenes de avatar
       # Ancho, en pixeles
       AVATAR_MAX_WIDTH: 256

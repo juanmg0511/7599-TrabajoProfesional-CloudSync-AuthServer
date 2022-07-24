@@ -57,7 +57,16 @@ sendmail_password_default = None
 sendmail_tls_default = "0"
 sendmail_ssl_default = "0"
 sendmail_base_url_default = "http://127.0.0.1"
-username_max_length_default = 25
+username_max_length_default = 64
+password_policy_default = {
+    "min": 5,
+    "max": 256,
+    "digits": False,
+    "letters": False,
+    "lowercase": False,
+    "uppercase": False,
+    "symbols": False
+}
 avatar_max_width_default = 256
 avatar_max_height_default = 256
 avatar_max_size_default = 524288
@@ -146,6 +155,23 @@ prune_interval_recovery = \
 # Lectura de la longitud maxima para usernames
 username_max_length = os.environ.get("USERNAME_MAX_LENGTH",
                                      username_max_length_default)
+# Lectura de la politica de configuracion de contrasenias
+password_policy = {
+    "min": os.environ.get("PASSWORD_POLICY_MIN",
+                          password_policy_default["min"]),
+    "max": os.environ.get("PASSWORD_POLICY_MAX",
+                          password_policy_default["max"]),
+    "digits": os.environ.get("PASSWORD_POLICY_DIGITS",
+                             password_policy_default["digits"]),
+    "letters": os.environ.get("PASSWORD_POLICY_LETTERS",
+                              password_policy_default["letters"]),
+    "lowercase": os.environ.get("PASSWORD_POLICY_LOWERCASE",
+                                password_policy_default["lowercase"]),
+    "uppercase": os.environ.get("PASSWORD_POLICY_UPPERCASE",
+                                password_policy_default["uppercase"]),
+    "symbols": os.environ.get("PASSWORD_POLICY_SYMBOLS",
+                              password_policy_default["symbols"])
+}
 # Lectura de las dimensiones para las imagenes de avatar
 avatar_max_width = os.environ.get("AVATAR_MAX_WIDTH",
                                   avatar_max_width_default)
