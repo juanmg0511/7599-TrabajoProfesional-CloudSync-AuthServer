@@ -7,8 +7,7 @@
 # https://medium.com/@riken.mehta/full-stack-tutorial-flask-react-docker-ee316a46e876
 
 # Importacion de librerias necesarias
-# OS para leer variables de entorno y logging para escribir los logs
-import os
+# Logging para escribir los logs
 import logging
 import atexit
 # Flask, para la implementacion del servidor REST
@@ -207,10 +206,8 @@ if __name__ == '__main__':
     app.logger.setLevel("DEBUG")
     app.logger.debug("Log system configured for WSGI.")
     # Seteo de modo debug y puerto - tomado de variables de entorno
-    ENVIRONMENT_DEBUG = os.environ.get("APP_DEBUG",
-                                       config.app_debug_default)
-    ENVIRONMENT_PORT = os.environ.get("APP_PORT", os.environ.get("PORT",
-                                      config.app_port_default))
+    ENVIRONMENT_DEBUG = config.app_debug
+    ENVIRONMENT_PORT = config.app_port
     # Logueo de los valores configurados mediante variables de entorno
     helpers.config_log()
     app.run(host='0.0.0.0', port=ENVIRONMENT_PORT, debug=ENVIRONMENT_DEBUG)

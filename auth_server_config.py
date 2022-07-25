@@ -7,7 +7,7 @@
 # https://medium.com/@riken.mehta/full-stack-tutorial-flask-react-docker-ee316a46e876
 
 # Importacion de librerias necesarias
-# OS para leer variables de entorno y logging para escribir los logs
+# OS para leer variables de entorno
 import os
 
 
@@ -21,6 +21,10 @@ import os
 # Version de API y Server
 api_version = "1"
 server_version = "1.00"
+
+
+# Agregamos un root para todos los enpoints, con la api version
+api_path = "/api/v" + api_version
 
 
 ###############################################################################
@@ -76,16 +80,21 @@ mongodb_auth_source_default = "None"
 jwt_secret_default = "super-secret"
 
 
-# Agregamos un root para todos los enpoints, con la api version
-api_path = "/api/v" + api_version
-
-
 ###############################################################################
 #
 # Seccion de lectura de variables de entorno
 # Lee de docker-compose.yml al ejecutar el ambiente DEV
 #
 ###############################################################################
+
+
+# Lectura de la configuración de ambiente
+app_env = os.environ.get("APP_ENV",
+                         app_env_default)
+app_debug = os.environ.get("APP_DEBUG",
+                           app_debug_default)
+app_port = os.environ.get("APP_PORT", os.environ.get("PORT",
+                          app_port_default))
 
 
 # Configuracion del sistema de correo
@@ -112,6 +121,7 @@ if (sendmail_active == "1"):
 else:
     sendmail_active = False
 
+
 # Lectura del secret para los token jwt
 jwt_secret = os.environ.get("JWT_SECRET",
                             jwt_secret_default)
@@ -120,10 +130,6 @@ jwt_secret = os.environ.get("JWT_SECRET",
 # Inicializacion de Google login
 google_client_id = os.environ.get("GOOGLE_CLIENT_ID",
                                   google_client_id_default)
-
-
-# Lectura de la configuración de ambiente
-app_env = os.environ.get("APP_ENV", app_env_default)
 
 
 # Lectura de la API KEY
