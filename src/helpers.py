@@ -477,21 +477,21 @@ def send_recovery_notification(user, recovery_key, force_send=False):
     accent_color = None
     cs_logo = None
     if config.app_env == "QA":
-        subject = "CloudSync [Quality Assurance]"
+        subject = "FIUBA CloudSync [Quality Assurance]"
         accent_color = config.color_qa
         cs_logo = authServer.logo_cs_qa
     elif config.app_env == "PROD":
-        subject = "CloudSync"
+        subject = "FIUBA CloudSync"
         accent_color = config.color_prod
         cs_logo = authServer.logo_cs_prod
     else:
-        subject = "CloudSync [Development]"
+        subject = "FIUBA CloudSync [Development]"
         accent_color = config.color_dev
         cs_logo = authServer.logo_cs_dev
 
     msg = Message(subject + ": password recovery request",
-                  sender=("CloudSync Admin", config.sendmail_from),
-                  reply_to="no-reply@cloudsync.com",
+                  sender=("FIUBA CloudSync Admin", config.sendmail_from),
+                  reply_to="no-reply@fiuba-cloudsync.com",
                   recipients=[str(user["contact"]["email"])])
 
     msg.html = authServer.\
