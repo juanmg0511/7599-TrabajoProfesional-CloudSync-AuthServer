@@ -474,12 +474,21 @@ def send_recovery_notification(user, recovery_key, force_send=False):
                                       "Mail not sent.")
         return -1
 
+    accent_color = None
+    cs_logo = None
     if config.app_env == "QA":
         subject = "CloudSync [Quality Assurance]"
+        accent_color = config.color_qa
+        cs_logo = authServer.logo_cs_qa
     elif config.app_env == "PROD":
         subject = "CloudSync"
+        accent_color = config.color_prod
+        cs_logo = authServer.logo_cs_prod
     else:
         subject = "CloudSync [Development]"
+        accent_color = config.color_dev
+        cs_logo = authServer.logo_cs_dev
+
     msg = Message(subject + ": password recovery request",
                   sender=("CloudSync Admin", config.sendmail_from),
                   reply_to="no-reply@cloudsync.com",
@@ -487,10 +496,16 @@ def send_recovery_notification(user, recovery_key, force_send=False):
 
     msg.html = authServer.\
         mail_template.\
+        replace("#5B9CFF",
+                accent_color).\
         replace("wwww://wwwww-wwwwww-w-www-wwwww.wwwwwwwww.www",
                 config.sendmail_base_url).\
         replace("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                recovery_key)
+                recovery_key).\
+        replace("yyyy-yyyy-yyyy",
+                user["username"]).\
+        replace("zzzz-zzzz-zzzz",
+                cs_logo)
     message = "Mail dispatched successfully."
     exception = None
     try:

@@ -26,6 +26,10 @@ server_version = "1.00"
 # Agregamos un root para todos los enpoints, con la api version
 api_path = "/api/v" + api_version
 
+# Colores para los distintos ambientes
+color_prod = "#5B9CFF"
+color_qa = "#F58A06"
+color_dev = "#228C22"
 
 ###############################################################################
 #

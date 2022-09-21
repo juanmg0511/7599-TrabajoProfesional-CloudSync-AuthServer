@@ -61,6 +61,9 @@ else:
     app.config["MAIL_USE_SSL"] = False
 # Lectura del template para los mails de recovery
 mail_template = helpers.loadTextFile("templates/mailTemplate.html")
+logo_cs_dev = helpers.loadTextFile("templates/logo-cs-dev.b64")
+logo_cs_qa = helpers.loadTextFile("templates/logo-cs-qa.b64")
+logo_cs_prod = helpers.loadTextFile("templates/logo-cs-prod.b64")
 # Inicializacion del sistema de correo
 mail = Mail(app)
 
