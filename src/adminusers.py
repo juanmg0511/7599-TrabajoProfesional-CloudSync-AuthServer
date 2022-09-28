@@ -52,6 +52,11 @@ class AllAdminUsers(Resource):
                                 type=int,
                                 required=False,
                                 nullable=False)
+            # Texto para filtrar los resultados
+            parser.add_argument("user_filter",
+                                type=helpers.non_empty_and_safe_username,
+                                required=False,
+                                nullable=False)
             args = parser.parse_args()
         except Exception:
             AllUsersResponseGet = {
@@ -69,6 +74,7 @@ class AllAdminUsers(Resource):
             show_closed = True
         else:
             show_closed = False
+        user_filter = args.get("user_filter", None)
 
         # Parseo de los parametros para el pagindo
         query_start = str(args.get("start", 0))
@@ -86,26 +92,29 @@ class AllAdminUsers(Resource):
         else:
             query_limit = 0
 
-        if (show_closed is True):
-            try:
-                allUsers = authServer.db.adminusers.\
-                           find().\
-                           skip(query_start).\
-                           limit(query_limit)
-                allUsersCount = authServer.db.adminusers.\
-                    count_documents({})
-            except Exception as e:
-                return helpers.handleDatabasebError(e)
-        else:
-            try:
-                allUsers = authServer.db.adminusers.\
-                           find({"account_closed": False}).\
-                           skip(query_start).\
-                           limit(query_limit)
-                allUsersCount = authServer.db.adminusers.\
-                    count_documents({"account_closed": False})
-            except Exception as e:
-                return helpers.handleDatabasebError(e)
+        # Se construye el query para filtrar en base a los parametros
+        # opcionales
+        find_query = {}
+        if (show_closed is False):
+            find_query["account_closed"] = False
+        if (user_filter is not None):
+            find_query["username"] = {
+                "$regex": ".*" + str(user_filter) + ".*",
+                "$options": 'i'
+            }
+        authServer.app.logger.info(helpers.log_request_id() +
+                                   str(find_query))
+
+        # Operacion de base de datos
+        try:
+            allUsers = authServer.db.adminusers.\
+                        find(find_query).\
+                        skip(query_start).\
+                        limit(query_limit)
+            allUsersCount = authServer.db.adminusers.\
+                count_documents(find_query)
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
 
         # Calculo de las URL hacia anterior y siguiente
         start_previous = query_start - query_limit
