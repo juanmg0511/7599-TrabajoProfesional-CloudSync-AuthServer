@@ -144,12 +144,22 @@ class AllAdminUsers(Resource):
 
         AllUsersResultsGet = []
         for existingUser in allUsers:
+
+            # Operacion de base de datos
+            try:
+                userSessionsCount = \
+                        authServer.db.sessions.\
+                        count_documents({"username": existingUser["username"]})
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
+
             retrievedUser = {
                 "id": str(existingUser["_id"]),
                 "username": existingUser["username"],
                 "first_name": existingUser["first_name"],
                 "last_name":  existingUser["last_name"],
                 "email": existingUser["email"],
+                "online": True if (userSessionsCount > 0) else False,
                 "account_closed": existingUser["account_closed"],
                 "date_created": existingUser["date_created"],
                 "date_updated": existingUser["date_updated"]
@@ -260,13 +270,23 @@ class AdminUser(Resource):
                 {"username": username})
         except Exception as e:
             return helpers.handleDatabasebError(e)
+
         if (existingUser is not None):
+
+            try:
+                userSessionsCount = \
+                    authServer.db.sessions.\
+                    count_documents({"username": existingUser["username"]})
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
+
             UserResponseGet = {
                 "id": str(existingUser["_id"]),
                 "username": existingUser["username"],
                 "first_name": existingUser["first_name"],
                 "last_name": existingUser["last_name"],
                 "email": existingUser["email"],
+                "online": True if (userSessionsCount > 0) else False,
                 "account_closed": existingUser["account_closed"],
                 "date_created": existingUser["date_created"],
                 "date_updated": existingUser["date_updated"]
