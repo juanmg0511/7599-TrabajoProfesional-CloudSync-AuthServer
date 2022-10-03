@@ -54,6 +54,11 @@ class AllRecovery(Resource):
                                 type=int,
                                 required=False,
                                 nullable=False)
+            # Texto para filtrar los resultados
+            parser.add_argument("user_filter",
+                                type=helpers.non_empty_and_safe_username,
+                                required=False,
+                                nullable=False)
             args = parser.parse_args()
         except Exception:
             AllRecoveryResponseGet = {
@@ -63,6 +68,8 @@ class AllRecovery(Resource):
             }
             return helpers.return_request(AllRecoveryResponseGet,
                                           HTTPStatus.BAD_REQUEST)
+
+        user_filter = args.get("user_filter", None)
 
         # Parseo de los parametros para el pagindo
         query_start = str(args.get("start", 0))
@@ -80,13 +87,23 @@ class AllRecovery(Resource):
         else:
             query_limit = 0
 
+        # Se construye el query para filtrar en base a los parametros
+        # opcionales
+        find_query = {}
+        if (user_filter is not None):
+            find_query["username"] = {
+                "$regex": ".*" + str(user_filter) + ".*",
+                "$options": 'i'
+            }
+
+        # Operacion de base de datos
         try:
             AllRecoveries = authServer.db.recovery.\
-                            find().\
+                            find(find_query).\
                             skip(query_start).\
                             limit(query_limit)
             AllRecoveriesCount = authServer.db.recovery.\
-                count_documents({})
+                count_documents(find_query)
         except Exception as e:
             return helpers.handleDatabasebError(e)
 

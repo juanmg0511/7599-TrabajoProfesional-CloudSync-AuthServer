@@ -102,8 +102,6 @@ class AllAdminUsers(Resource):
                 "$regex": ".*" + str(user_filter) + ".*",
                 "$options": 'i'
             }
-        authServer.app.logger.info(helpers.log_request_id() +
-                                   str(find_query))
 
         # Operacion de base de datos
         try:
