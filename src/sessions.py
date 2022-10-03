@@ -147,6 +147,9 @@ class AllSessions(Resource):
                 "username": existingSession["username"],
                 "user_role": existingSession["user_role"],
                 "session_token": existingSession["session_token"],
+                "expired":  (datetime.utcnow() >
+                             datetime.
+                             fromisoformat(existingSession["expires"])),
                 "expires": existingSession["expires"],
                 "date_created": existingSession["date_created"]
             }
@@ -536,6 +539,9 @@ class Session(Resource):
                 }
                 SessionResponseGet = sessionToUpdate.copy()
                 SessionResponseGet["id"] = str(existingSession["_id"])
+                SessionResponseGet["expired"] = (datetime.utcnow() >
+                                                 datetime.
+                                                 fromisoformat(new_expiry))
                 try:
                     authServer.db.sessions.update_one(
                         {"session_token": token}, {'$set': sessionToUpdate})

@@ -140,6 +140,8 @@ class AllRecovery(Resource):
                 "username": existingRecovery["username"],
                 "email": existingRecovery["email"],
                 "recovery_key": existingRecovery["recovery_key"],
+                "expired":  (datetime.utcnow() > datetime.
+                             fromisoformat(existingRecovery["expires"])),
                 "expires":  existingRecovery["expires"],
                 "date_created": existingRecovery["date_created"]
             }
@@ -311,6 +313,9 @@ class Recovery(Resource):
                               "username": existingRecovery["username"],
                               "email": existingRecovery["email"],
                               "recovery_key": existingRecovery["recovery_key"],
+                              "expired": (datetime.utcnow() >
+                                          datetime.fromisoformat(
+                                            existingRecovery["expires"])),
                               "expires":  existingRecovery["expires"],
                               "date_created": existingRecovery["date_created"]
                             }
