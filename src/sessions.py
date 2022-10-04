@@ -542,6 +542,7 @@ class Session(Resource):
                 SessionResponseGet["expired"] = (datetime.utcnow() >
                                                  datetime.
                                                  fromisoformat(new_expiry))
+
                 try:
                     authServer.db.sessions.update_one(
                         {"session_token": token}, {'$set': sessionToUpdate})
