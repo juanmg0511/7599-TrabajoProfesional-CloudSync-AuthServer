@@ -146,8 +146,11 @@ class AllAdminUsers(Resource):
             # Operacion de base de datos
             try:
                 userSessionsCount = \
-                        authServer.db.sessions.\
-                        count_documents({"username": existingUser["username"]})
+                    authServer.db.sessions.\
+                    count_documents({
+                        "username": existingUser["username"],
+                        "expires": {"$gt": datetime.utcnow().isoformat()}
+                        })
             except Exception as e:
                 return helpers.handleDatabasebError(e)
 
@@ -274,7 +277,10 @@ class AdminUser(Resource):
             try:
                 userSessionsCount = \
                     authServer.db.sessions.\
-                    count_documents({"username": existingUser["username"]})
+                    count_documents({
+                        "username": existingUser["username"],
+                        "expires": {"$gt": datetime.utcnow().isoformat()}
+                    })
             except Exception as e:
                 return helpers.handleDatabasebError(e)
 

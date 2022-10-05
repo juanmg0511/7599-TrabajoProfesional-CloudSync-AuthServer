@@ -147,7 +147,10 @@ class AllUsers(Resource):
             try:
                 userSessionsCount = \
                     authServer.db.sessions.\
-                    count_documents({"username": existingUser["username"]})
+                    count_documents({
+                        "username": existingUser["username"],
+                        "expires": {"$gt": datetime.utcnow().isoformat()}
+                    })
             except Exception as e:
                 return helpers.handleDatabasebError(e)
 
@@ -363,7 +366,10 @@ class User(Resource):
             try:
                 userSessionsCount = \
                     authServer.db.sessions.\
-                    count_documents({"username": existingUser["username"]})
+                    count_documents({
+                        "username": existingUser["username"],
+                        "expires": {"$gt": datetime.utcnow().isoformat()}
+                    })
             except Exception as e:
                 return helpers.handleDatabasebError(e)
 
