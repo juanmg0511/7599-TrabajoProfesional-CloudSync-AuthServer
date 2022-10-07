@@ -38,7 +38,8 @@ from src import helpers
 # Operaciones CRUD: Create, Read, Update, Delete
 # verbo GET - listar sesiones activas
 # verbo POST - crear sesion, si existe refresca el token
-# verbo DELETE - cerrar sesion de todos los usuarios
+# verbo DELETE - cerrar sesion de todos los usuarios,
+# menos la sesion pasada por parametro
 class AllSessions(Resource):
     # verbo GET - listar sesiones
     @helpers.require_apikey
@@ -458,24 +459,62 @@ class AllSessions(Resource):
         return helpers.return_request(SessionResponsePost,
                                       HTTPStatus.UNAUTHORIZED)
 
-    # verbo DELETE - cerrar sesion de todos los usuarios
+    # verbo DELETE - cerrar sesion de todos los usuarios,
+    # menos la sesion pasada por parametro
     @helpers.require_apikey
     @helpers.log_reqId
     def delete(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("token", type=helpers.non_empty_string,
+                                required=True, nullable=False)
+            args = parser.parse_args()
+        except Exception:
+            RecoveryResponsePost = {
+                "code": -1,
+                "message": "Bad request. Missing required arguments.",
+                "data": None
+            }
+            return helpers.return_request(RecoveryResponsePost,
+                                          HTTPStatus.BAD_REQUEST)
+
         authServer.app.logger.info(helpers.log_request_id() +
-                                   "Session deletion for all users requested.")
+                                   "Session deletion for all users " +
+                                   "except token '" +
+                                   args["token"] +
+                                   "' requested.")
 
         try:
-            authServer.db.sessions.delete_many({"session_token": "12345"})
+            existingSession = authServer.db.sessions.find_one({
+                "session_token": args["token"]
+            })
         except Exception as e:
             return helpers.handleDatabasebError(e)
+        if (existingSession is not None):
+
+            try:
+                authServer.db.sessions.delete_many({
+                    "session_token": {"$ne": args["token"]}
+                })
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
+
+            SessionResponseDelete = {
+                "code": 0,
+                "message": "All sessions except token '" +
+                           args["token"] +
+                           "' deleted.",
+                "data": None
+            }
+            return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
 
         SessionResponseDelete = {
-            "code": 0,
-            "message": "Sessions for all users deleted.",
+            "code": -2,
+            "message": "Session with token '" + args["token"] + "' not found.",
             "data": None
         }
-        return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
+        return helpers.return_request(SessionResponseDelete,
+                                      HTTPStatus.NOT_FOUND)
 
 
 # Clase que define el endpoint para trabajar con sesiones
@@ -609,14 +648,17 @@ class Session(Resource):
                                    "' requested.")
 
         try:
-            existingSession = authServer.db.sessions.find_one(
-                {"session_token": token})
+            existingSession = authServer.db.sessions.find_one({
+                "session_token": token
+            })
         except Exception as e:
             return helpers.handleDatabasebError(e)
         if (existingSession is not None):
 
             try:
-                authServer.db.sessions.delete_one({"session_token": token})
+                authServer.db.sessions.delete_one({
+                    "session_token": token
+                })
             except Exception as e:
                 return helpers.handleDatabasebError(e)
 
@@ -628,8 +670,9 @@ class Session(Resource):
             return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
 
         SessionResponseDelete = {
-            "code": 0,
+            "code": -1,
             "message": "Session with token '" + token + "' not found.",
             "data": None
         }
-        return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
+        return helpers.return_request(SessionResponseDelete,
+                                      HTTPStatus.NOT_FOUND)

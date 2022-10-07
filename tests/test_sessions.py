@@ -291,11 +291,33 @@ class SessionsTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.OK, r2.status_code)
         self.assertEqual(0, r2.json["code"])
 
-    def test_delete_session_non_existing_token_should_return_ok(self):
+    def test_delete_session_non_existing_token_should_return_not_found(self):
         r = self.app.delete('/api/v1/sessions/fake-token',
                             headers={'X-Client-ID': aux_functions.X_Client_ID})
-        self.assertEqual(HTTPStatus.OK, r.status_code)
-        self.assertEqual(0, r.json["code"])
+        self.assertEqual(HTTPStatus.NOT_FOUND, r.status_code)
+        self.assertEqual(-1, r.json["code"])
+
+    def test_delete_all_sessions_should_return_ok(self):
+        r1 = aux_functions.createSession("testunituser_delete", self)
+        r2 = self.app.delete('/api/v1/sessions?token=' +
+                             str(r1.json['session_token']),
+                             headers={'X-Client-ID':
+                                      aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r2.status_code)
+        self.assertEqual(0, r2.json["code"])
+
+    def test_delete_all_sessions_should_return_bad_request(self):
+        r1 = self.app.delete('/api/v1/sessions',
+                             headers={'X-Client-ID':
+                                      aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, r1.status_code)
+        self.assertEqual(-1, r1.json["code"])
+
+    def test_delete_all_sessions_non_existing_token_should_return_404(self):
+        r = self.app.delete('/api/v1/sessions?token=fake-token',
+                            headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.NOT_FOUND, r.status_code)
+        self.assertEqual(-2, r.json["code"])
 
     def test_post_service_user_should_return_unauthorized(self):
         r = self.app.post('/api/v1/sessions',
