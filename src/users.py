@@ -16,6 +16,8 @@ from http import HTTPStatus
 # Passlib para encriptar contrasenias
 from passlib.apps import custom_app_context
 
+# Importacion de las configuracion del Auth Server
+import auth_server_config as config
 # Importacion del archivo principal y helpers
 import auth_server as authServer
 from src import helpers
@@ -87,10 +89,10 @@ class AllUsers(Resource):
         query_limit = str(args.get("limit", 0))
         if (query_limit != "None"):
             query_limit = int(query_limit)
-            if (query_limit < 0):
-                query_limit = 0
+            if (query_limit <= 0 or query_limit > int(config.page_max_size)):
+                query_limit = int(config.page_max_size)
         else:
-            query_limit = 0
+            query_limit = int(config.page_max_size)
 
         # Se construye el query para filtrar en base a los parametros
         # opcionales
@@ -749,10 +751,10 @@ class UserSessions(Resource):
         query_limit = str(args.get("limit", 0))
         if (query_limit != "None"):
             query_limit = int(query_limit)
-            if (query_limit < 0):
-                query_limit = 0
+            if (query_limit <= 0 or query_limit > int(config.page_max_size)):
+                query_limit = int(config.page_max_size)
         else:
-            query_limit = 0
+            query_limit = int(config.page_max_size)
 
         try:
             existingUser = authServer.db.users.find_one({"username": username})

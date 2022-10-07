@@ -38,6 +38,7 @@ from src import helpers
 # Operaciones CRUD: Create, Read, Update, Delete
 # verbo GET - listar sesiones activas
 # verbo POST - crear sesion, si existe refresca el token
+# verbo DELETE - cerrar sesion de todos los usuarios
 class AllSessions(Resource):
     # verbo GET - listar sesiones
     @helpers.require_apikey
@@ -89,10 +90,10 @@ class AllSessions(Resource):
         query_limit = str(args.get("limit", 0))
         if (query_limit != "None"):
             query_limit = int(query_limit)
-            if (query_limit < 0):
-                query_limit = 0
+            if (query_limit <= 0 or query_limit > int(config.page_max_size)):
+                query_limit = int(config.page_max_size)
         else:
-            query_limit = 0
+            query_limit = int(config.page_max_size)
 
         # Se construye el query para filtrar en base a los parametros
         # opcionales
@@ -456,6 +457,25 @@ class AllSessions(Resource):
         }
         return helpers.return_request(SessionResponsePost,
                                       HTTPStatus.UNAUTHORIZED)
+
+    # verbo DELETE - cerrar sesion de todos los usuarios
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def delete(self):
+        authServer.app.logger.info(helpers.log_request_id() +
+                                   "Session deletion for all users requested.")
+
+        try:
+            authServer.db.sessions.delete_many({"session_token": "12345"})
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
+
+        SessionResponseDelete = {
+            "code": 0,
+            "message": "Sessions for all users deleted.",
+            "data": None
+        }
+        return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
 
 
 # Clase que define el endpoint para trabajar con sesiones

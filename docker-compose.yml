@@ -75,7 +75,9 @@ services:
       AVATAR_MAX_HEIGHT: 256
       # Tamanio, en bytes
       AVATAR_MAX_SIZE: 524288
-      #Configuracion para Google login
+      # Tamanio maximo de pagina para la devolucion de resultados
+      PAGE_MAX_SIZE: 100
+      # Configuracion para Google login
       GOOGLE_CLIENT_ID: "*"
       # Datos para conectarse a la DB
       MONGODB_DATABASE: "auth-server-db"

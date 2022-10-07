@@ -82,10 +82,10 @@ class AllRecovery(Resource):
         query_limit = str(args.get("limit", 0))
         if (query_limit != "None"):
             query_limit = int(query_limit)
-            if (query_limit < 0):
-                query_limit = 0
+            if (query_limit <= 0 or query_limit > int(config.page_max_size)):
+                query_limit = int(config.page_max_size)
         else:
-            query_limit = 0
+            query_limit = int(config.page_max_size)
 
         # Se construye el query para filtrar en base a los parametros
         # opcionales

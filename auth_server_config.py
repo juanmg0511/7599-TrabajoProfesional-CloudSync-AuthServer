@@ -73,6 +73,7 @@ password_policy_default = {
 avatar_max_width_default = 256
 avatar_max_height_default = 256
 avatar_max_size_default = 524288
+page_max_size_default = 100
 google_client_id_default = None
 mongodb_hostname_default = "127.0.0.1"
 mongodb_database_default = "auth-server-db:27017"
@@ -195,6 +196,11 @@ avatar_max_height = os.environ.get("AVATAR_MAX_HEIGHT",
                                    avatar_max_height_default)
 avatar_max_size = os.environ.get("AVATAR_MAX_SIZE",
                                  avatar_max_size_default)
+
+
+# Lectura del tamanio maximo de pagina para la devolucion de resultados
+page_max_size = os.environ.get("PAGE_MAX_SIZE",
+                               page_max_size_default)
 
 
 # Lectura de la configuracion del servidor de base de datos
