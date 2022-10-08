@@ -65,7 +65,8 @@ class AllSessions(Resource):
                                 nullable=False)
             # Texto para filtrar los resultados
             parser.add_argument("user_filter",
-                                type=helpers.non_empty_and_safe_username,
+                                type=helpers.
+                                non_empty_and_safe_filter_username,
                                 required=False,
                                 nullable=False)
             args = parser.parse_args()

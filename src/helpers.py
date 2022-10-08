@@ -10,6 +10,7 @@
 # OS para leer variables de entorno y logging para escribir los logs
 import sys
 import io
+import re
 from datetime import datetime, timedelta
 # Flask, para la implementacion del servidor REST
 from flask import request
@@ -388,6 +389,14 @@ def non_empty_and_safe_username(u):
     if is_safe_username(u,
                         max_length=int(
                             config.username_max_length)) is False:
+        raise ValueError("Invalid username.")
+    return u
+
+
+# Funcion que chequea si un nombre de usario es seguro para usar como filtro
+def non_empty_and_safe_filter_username(u):
+
+    if (not re.match("^[a-zA-Z0-9_.]+$", u)):
         raise ValueError("Invalid username.")
     return u
 
