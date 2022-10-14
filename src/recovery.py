@@ -304,34 +304,21 @@ class Recovery(Resource):
                                             {"username": username})
                     except Exception as e:
                         return helpers.handleDatabasebError(e)
-                    if (existingRecovery is not None):
-                        if (datetime.utcnow()
-                           <
-                           datetime.fromisoformat(
-                              existingRecovery["expires"])):
-                            RecoveryResponsePost = {
-                              "id": str(existingRecovery["_id"]),
-                              "username": existingRecovery["username"],
-                              "email": existingRecovery["email"],
-                              "recovery_key": existingRecovery["recovery_key"],
-                              "expired": (datetime.utcnow() >
-                                          datetime.fromisoformat(
-                                            existingRecovery["expires"])),
-                              "expires":  existingRecovery["expires"],
-                              "date_created": existingRecovery["date_created"]
-                            }
-                            return helpers.return_request(RecoveryResponsePost,
-                                                          HTTPStatus.OK)
 
-                        RecoveryResponseGet = {
-                            "code": -2,
-                            "message": "Recovery request for user '" +
-                                       username +
-                                       "' has expired.",
-                            "data": None
+                    if (existingRecovery is not None):
+                        RecoveryResponsePost = {
+                            "id": str(existingRecovery["_id"]),
+                            "username": existingRecovery["username"],
+                            "email": existingRecovery["email"],
+                            "recovery_key": existingRecovery["recovery_key"],
+                            "expired": (datetime.utcnow() >
+                                        datetime.fromisoformat(
+                                        existingRecovery["expires"])),
+                            "expires":  existingRecovery["expires"],
+                            "date_created": existingRecovery["date_created"]
                         }
-                        return helpers.return_request(RecoveryResponseGet,
-                                                      HTTPStatus.UNAUTHORIZED)
+                        return helpers.return_request(RecoveryResponsePost,
+                                                      HTTPStatus.OK)
 
                     RecoveryResponseGet = {
                         "code": -3,
