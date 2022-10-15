@@ -359,7 +359,10 @@ def non_empty_image(i):
             # Validacion de tamanio
             fileSize = math.ceil(len(i) / 4) * 3
             if (fileSize <= int(config.avatar_max_size)):
-                return i
+                return ("data:image/" +
+                        img.format.lower() +
+                        ";base64," +
+                        i)
             else:
                 raise ValueError("Image size exceeds the " +
                                  "maximum allowed value.")
