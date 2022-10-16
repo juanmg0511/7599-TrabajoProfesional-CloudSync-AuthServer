@@ -279,6 +279,8 @@ class AllRecovery(Resource):
 # verbo GET - recuperar un pedido especifico de recupero de contraseña
 # verbo POST - cambia la password del usuario, y borra el pedido de
 # recuperacion de contraseña, si los datos coinciden
+# verbo DELETE - borra el pedido de recuperacion de contraseña de
+# un usuario
 class Recovery(Resource):
     # verbo GET - recuperar un pedido especifico de recupero de contraseña
     @helpers.require_apikey
@@ -532,4 +534,51 @@ class Recovery(Resource):
             "data": None
         }
         return helpers.return_request(RecoveryResponsePost,
+                                      HTTPStatus.NOT_FOUND)
+
+    # verbo DELETE - borra el pedido de recuperacion de contraseña de
+    # un usuario
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def delete(self, username):
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
+
+        authServer.app.logger.info(helpers.log_request_id() +
+                                   "Password (recovery) for user '" +
+                                   username +
+                                   "' deletion requested.")
+
+        try:
+            existingRecovery = authServer.db.recovery.find_one({
+                "username": username
+            })
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
+        if (existingRecovery is not None):
+
+            try:
+                authServer.db.recovery.delete_one({
+                    "username": username
+                })
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
+
+            SessionResponseDelete = {
+                "code": 0,
+                "message": "Password (recovery) for user '" +
+                           username +
+                           "' deleted.",
+                "data": None
+            }
+            return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
+
+        SessionResponseDelete = {
+            "code": -1,
+            "message": "Password (recovery) for user '" +
+                       username +
+                       "' not found.",
+            "data": None
+        }
+        return helpers.return_request(SessionResponseDelete,
                                       HTTPStatus.NOT_FOUND)

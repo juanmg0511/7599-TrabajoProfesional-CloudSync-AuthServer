@@ -28,6 +28,7 @@ class RecoveryTestCase(unittest.TestCase):
         aux_functions.createTestUser("testunituser_post", cls)
         aux_functions.createTestUser("testunituser_post_bad_request", cls)
         aux_functions.createTestUser("testunituser_post_closed", cls)
+        aux_functions.createTestUser("testunituser_delete", cls)
         aux_functions.createTestUserService("testunituser_post_service", cls)
         aux_functions.createTestUserService("testunituser_get_service", cls)
         # Creamos los recovery requests a ser utilizados durante los tests
@@ -47,6 +48,7 @@ class RecoveryTestCase(unittest.TestCase):
         aux_functions.deleteTestUser("testunituser_post_closed")
         aux_functions.deleteTestUser("testunituser_post_service")
         aux_functions.deleteTestUser("testunituser_get_service")
+        aux_functions.deleteTestUser("testunituser_delete")
 
         print("Finished testing path \"/recovery\" of the auth server!")
 
@@ -253,6 +255,23 @@ class RecoveryTestCase(unittest.TestCase):
                           )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
         self.assertEqual(-3, r.json["code"])
+
+    def test_delete_recovery_user_should_return_ok(self):
+        aux_functions.createRecoveryRequest("testunituser_delete", self)
+        r2 = self.app.delete('/api/v1/recovery/testunituser_delete',
+                             headers={'Content-Type': 'application/json',
+                                      'X-Client-ID': aux_functions.X_Client_ID}
+                             )
+        self.assertEqual(HTTPStatus.OK, r2.status_code)
+        self.assertEqual(0, r2.json["code"])
+
+    def test_delete_recovery_bad_user_should_return_not_found(self):
+        r2 = self.app.delete('/api/v1/recovery/testunituser_delete_no',
+                             headers={'Content-Type': 'application/json',
+                                      'X-Client-ID': aux_functions.X_Client_ID}
+                             )
+        self.assertEqual(HTTPStatus.NOT_FOUND, r2.status_code)
+        self.assertEqual(-1, r2.json["code"])
 
 
 if __name__ == '__main__':

@@ -704,6 +704,7 @@ class User(Resource):
 
 # Clase que define el endpoint para obtener las sesiones de un usuario
 # verbo GET - obtener sesiones vigentes del usuario
+# verbo DELETE - cerrar todas las sesiones del usuario
 class UserSessions(Resource):
 
     # verbo GET - obtener sesiones vigentes del usuario
@@ -842,3 +843,49 @@ class UserSessions(Resource):
             "data": None
         }
         return helpers.return_request(UserSessionsGet, HTTPStatus.NOT_FOUND)
+
+    # verbo DELETE - cerrar todas las sesiones del usuario
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def delete(self, username):
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
+
+        authServer.app.logger.info(helpers.log_request_id() +
+                                   "All sessions deletion for user '" +
+                                   username +
+                                   "' requested.")
+
+        try:
+            existingSession = authServer.db.sessions.find_one({
+                "username": username
+            })
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
+        if (existingSession is not None):
+
+            try:
+                authServer.db.sessions.delete_many({
+                    "username": username
+                })
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
+
+            SessionResponseDelete = {
+                "code": 0,
+                "message": "All sessions for user '" +
+                           username +
+                           "' deleted.",
+                "data": None
+            }
+            return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
+
+        SessionResponseDelete = {
+            "code": -1,
+            "message": "No sessions for user '" +
+                       username +
+                       "' were found.",
+            "data": None
+        }
+        return helpers.return_request(SessionResponseDelete,
+                                      HTTPStatus.NOT_FOUND)

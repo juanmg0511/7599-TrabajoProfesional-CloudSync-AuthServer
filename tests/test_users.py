@@ -574,6 +574,21 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
         self.assertEqual(-1, r.json["code"])
 
+    def test_delete_all_user_sessions_should_return_ok(self):
+        aux_functions.createSession("testunituser_delete", self)
+        r2 = self.app.delete('/api/v1/users/testunituser_delete/sessions',
+                             headers={'X-Client-ID':
+                                      aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r2.status_code)
+        self.assertEqual(0, r2.json["code"])
+
+    def test_delete_all_user_no_sessions_should_return_not_found(self):
+        r2 = self.app.delete('/api/v1/users/testunituser_delete_no/sessions',
+                             headers={'X-Client-ID':
+                                      aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.NOT_FOUND, r2.status_code)
+        self.assertEqual(-1, r2.json["code"])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -523,6 +523,7 @@ class AdminUser(Resource):
 
 # Clase que define el endpoint para obtener las sesiones de un usuario admin
 # verbo GET - obtener sesiones vigentes del usuario admin
+# verbo DELETE - cerrar todas las sesiones del usuario admin
 class AdminUserSessions(Resource):
 
     # verbo GET - obtener sesiones vigentes del usuario admin
@@ -661,3 +662,49 @@ class AdminUserSessions(Resource):
             "data": None
         }
         return helpers.return_request(UserSessionsGet, HTTPStatus.NOT_FOUND)
+
+    # verbo DELETE - cerrar todas las sesiones del usuario
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def delete(self, username):
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
+
+        authServer.app.logger.info(helpers.log_request_id() +
+                                   "All sessions deletion for admin user '" +
+                                   username +
+                                   "' requested.")
+
+        try:
+            existingSession = authServer.db.sessions.find_one({
+                "username": username
+            })
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
+        if (existingSession is not None):
+
+            try:
+                authServer.db.sessions.delete_many({
+                    "username": username
+                })
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
+
+            SessionResponseDelete = {
+                "code": 0,
+                "message": "All sessions for admin user '" +
+                           username +
+                           "' deleted.",
+                "data": None
+            }
+            return helpers.return_request(SessionResponseDelete, HTTPStatus.OK)
+
+        SessionResponseDelete = {
+            "code": -1,
+            "message": "No sessions for admin user '" +
+                       username +
+                       "' were found.",
+            "data": None
+        }
+        return helpers.return_request(SessionResponseDelete,
+                                      HTTPStatus.NOT_FOUND)
