@@ -35,6 +35,7 @@ class AdminusersTestCase(unittest.TestCase):
                                           "bad_request",
                                           cls)
         aux_functions.createAdminTestUser("testunitadminuser_delete", cls)
+        aux_functions.createAdminTestUser("testunitadminuser_delete_se", cls)
         # Creamos las sessions a ser utilizadas durante los tests
         aux_functions.createSessionAdmin("testunitadminuser_get", cls)
         aux_functions.createSessionAdmin("testunitadminuser_get", cls)
@@ -58,6 +59,8 @@ class AdminusersTestCase(unittest.TestCase):
         aux_functions.deleteAdminTestUser("testunitadminuser_patch_" +
                                           "bad_request")
         aux_functions.deleteAdminTestUser("testunitadminuser_delete")
+        aux_functions.deleteAdminTestUser("testunitadminuser_delete_se")
+
         print("Finished testing path \"/adminusers\" of the auth server!")
 
     def test_private_endpoints_no_api_key_should_return_unauthorized(self):
@@ -330,16 +333,17 @@ class AdminusersTestCase(unittest.TestCase):
         self.assertEqual(-1, r.json["code"])
 
     def test_delete_all_adminuser_sessions_should_return_ok(self):
-        aux_functions.createSession("testunitadminuser_delete", self)
-        r2 = self.app.delete('/api/v1/users/testunitadminuser_delete/sessions',
+        aux_functions.createSessionAdmin("testunitadminuser_delete_se", self)
+        r2 = self.app.delete('/api/v1/adminusers/' +
+                             'testunitadminuser_delete_se/sessions',
                              headers={'X-Client-ID':
                                       aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.OK, r2.status_code)
         self.assertEqual(0, r2.json["code"])
 
     def test_delete_all_adminuser_no_sessions_should_return_not_found(self):
-        r2 = self.app.delete('/api/v1/users/testunitadminuser_delete_no/' +
-                             'sessions',
+        r2 = self.app.delete('/api/v1/adminusers/' +
+                             'testunitadminuser_delete_se_no/sessions',
                              headers={'X-Client-ID':
                                       aux_functions.X_Client_ID})
         self.assertEqual(HTTPStatus.NOT_FOUND, r2.status_code)
