@@ -60,6 +60,20 @@ class AllRecovery(Resource):
                                 non_empty_and_safe_filter_username,
                                 required=False,
                                 nullable=False)
+            # Columna a utilizar para ordenar los resultados, si no se
+            # incluye se trabaja con natural order
+            parser.add_argument("sort_column",
+                                type=helpers.
+                                non_empty_string,
+                                required=False,
+                                nullable=False)
+            # Indica el tipo de orden a utilizar en el ordenamiento, se
+            # aplica independientemente de si es especificada una columna o
+            # no. El valor por default es ASCENDENTE (1)
+            parser.add_argument("sort_order",
+                                type=int,
+                                required=False,
+                                nullable=False)
             args = parser.parse_args()
         except Exception:
             AllRecoveryResponseGet = {
@@ -97,12 +111,25 @@ class AllRecovery(Resource):
                 "$options": 'i'
             }
 
+        # Se construye el sort para ordenar el query. Si no se especifica,
+        # se trabaja con el natural order
+        query_sort_column = args.get("sort_column", None)
+        query_sort_order = args.get("sort_order", None)
+        if (query_sort_column is None):
+            query_sort_column = "$natural"
+        if (
+            (query_sort_order is not None) and
+            (query_sort_order != -1)
+           ):
+            query_sort_order = 1
+
         # Operacion de base de datos
         try:
             AllRecoveries = authServer.db.recovery.\
                             find(find_query).\
                             skip(query_start).\
-                            limit(query_limit)
+                            limit(query_limit).\
+                            sort(query_sort_column, query_sort_order)
             AllRecoveriesCount = authServer.db.recovery.\
                 count_documents(find_query)
         except Exception as e:
