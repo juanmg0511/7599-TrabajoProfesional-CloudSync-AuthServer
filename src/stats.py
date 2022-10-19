@@ -166,11 +166,12 @@ def update_stats(response):
         # hits endpoint adminusers
         # hits endpoint sessions
         # hits endpoint recovery
-        # requests por minuto para el dia
+        # requests por minuto para el dia (parcial hasta el ultimo update)
         "requests_users": requests_users,
         "requests_adminusers": requests_adminusers,
         "requests_sessions": requests_sessions,
         "requests_recovery": requests_recovery,
+        "requests_per_minute": requests_number/1440,
         # tiempo de respuesta maximo
         # tiempo de respuesta minimo
         # tiempo de respuesta promedio
@@ -215,6 +216,8 @@ def update_stats(response):
 
 # Clase que entrega estadisticas del uso del servidor
 class Stats(Resource):
+
+    # verbo GET - obtener registros de estadisticas
     @helpers.require_apikey
     @helpers.log_reqId
     def get(self):
