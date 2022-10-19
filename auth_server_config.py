@@ -50,7 +50,8 @@ session_length_minutes_default_user = 60
 session_length_minutes_default_admin = 30
 recovery_length_minutes_default = 2880
 prune_interval_sessions_seconds_default = 3600
-prune_interval_recovery_seconds_default = 86400
+prune_interval_recovery_stats_seconds_default = 86400
+stats_days_to_keep_default = 30
 sendmail_active_default = "1"
 sendmail_server_default = "auth-server-mailhog"
 sendmail_from_default = "do-not-reply@cloudsync.com"
@@ -161,9 +162,12 @@ prune_interval_sessions = \
 
 # Lectura del intervalo de limpieza de recovery, en segundos
 prune_interval_recovery = \
-                        os.environ.get("PRUNE_INTERVAL_RECOVERY_SECONDS",
-                                       prune_interval_recovery_seconds_default)
+    os.environ.get("PRUNE_INTERVAL_RECOVERY_STATS_SECONDS",
+                   prune_interval_recovery_stats_seconds_default)
 
+# Lectura de la cantidad de dias que deben mantenerse los stats
+stats_days_to_keep = os.environ.get("STATS_DAYS_TO_KEEP",
+                                    stats_days_to_keep_default)
 
 # Lectura de la longitud maxima para usernames
 username_max_length = os.environ.get("USERNAME_MAX_LENGTH",

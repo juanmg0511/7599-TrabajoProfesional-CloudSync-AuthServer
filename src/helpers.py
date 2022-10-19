@@ -8,10 +8,9 @@
 
 # Importacion de librerias necesarias
 # OS para leer variables de entorno y logging para escribir los logs
-import sys
 import io
 import re
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 # Flask, para la implementacion del servidor REST
 from flask import request
 from flask_log_request_id import current_request_id
@@ -134,9 +133,12 @@ def config_log():
     authServer.app.logger.info("Prune interval for sessions is: " +
                                str(config.prune_interval_sessions) +
                                " seconds.")
-    authServer.app.logger.info("Prune interval for recovery is: " +
+    authServer.app.logger.info("Prune interval for recovery and stats is: " +
                                str(config.prune_interval_recovery) +
                                " seconds.")
+    authServer.app.logger.info("Time period to keep stats is: " +
+                               str(config.stats_days_to_keep) +
+                               " days.")
     if (config.sendmail_active is False):
         authServer.app.logger.warning("Send mail functionality is DISABLED. " +
                                       "Please enable \"SENDMAIL_ACTIVE\".")
@@ -179,31 +181,25 @@ def config_log():
 
 # Funcion que limpia la collection de sesiones vencidas
 def prune_sessions():
+
+    # Comienzo del proceso
     authServer.app.logger.info("prune_sessions: starting...")
+
+    # Limpieza de sessions
     try:
-        AllSessions = authServer.db.sessions.find()
-        sessionCount = authServer.db.sessions.count_documents({})
+        result = authServer.db.sessions.delete_many({
+            "expires": {"$lt": datetime.utcnow().isoformat()}
+        })
+        sessionsDeleted = result.deleted_count
+
     except Exception as e:
         return handleDatabasebError(e)
-    sessionDeleted = 0
-    if (sessionCount > 0):
-        authServer.app.logger.info("prune_sessions: " +
-                                   str(sessionCount) +
-                                   " sessions found.")
-        for existingSession in AllSessions:
-            if (datetime.utcnow()
-               >
-               datetime.fromisoformat(existingSession["expires"])):
-                try:
-                    authServer.db.sessions.delete_one(existingSession)
-                except Exception as e:
-                    return handleDatabasebError(e)
-                sessionDeleted += 1
-        authServer.app.logger.info("prune_sessions: deleted " +
-                                   str(sessionDeleted) +
-                                   " expired sessions.")
-    else:
-        authServer.app.logger.info("prune_sessions: no sessions found.")
+
+    authServer.app.logger.info("prune_sessions: deleted " +
+                               str(sessionsDeleted) +
+                               " expired sessions.")
+
+    # Fin del proceso
     authServer.app.logger.info("prune_sessions: done.")
 
     # Armamos el documento a guardar en la base de datos
@@ -212,7 +208,7 @@ def prune_sessions():
         "request_date": datetime.utcnow().isoformat(),
         "task_type": "prune expired sessions",
         "api_version": "v" + config.api_version,
-        "pruned_sessions": sessionDeleted
+        "pruned_sessions": sessionsDeleted
     }
     try:
         authServer.db.requestlog.insert_one(pruneSession)
@@ -224,43 +220,53 @@ def prune_sessions():
     return 0
 
 
-# Funcion que limpia la collection de recovery vencidas
-def prune_recovery():
+# Funcion que limpia la collection de recovery vencidas, y la
+# de stats de registros viejos
+def prune_recovery_stats():
 
-    authServer.app.logger.info("prune_recovery: starting...")
+    # Comienzo del proceso
+    authServer.app.logger.info("prune_recovery_stats: starting...")
+
+    # Limpieza de recovery
     try:
-        AllRecovery = authServer.db.recovery.find()
-        recoveryCount = authServer.db.recovery.count_documents({})
+        result = authServer.db.recovery.delete_many({
+            "expires": {"$lt": datetime.utcnow().isoformat()}
+        })
+        recoveryDeleted = result.deleted_count
+
     except Exception as e:
         return handleDatabasebError(e)
-    recoveryDeleted = 0
-    if (recoveryCount > 0):
-        authServer.app.logger.info("prune_recovery: " +
-                                   str(recoveryCount) +
-                                   " requests found.")
-        for existingRecovery in AllRecovery:
-            if (datetime.utcnow()
-               >
-               datetime.fromisoformat(existingRecovery["expires"])):
-                try:
-                    authServer.db.recovery.delete_one(existingRecovery)
-                except Exception as e:
-                    return handleDatabasebError(e)
-                recoveryDeleted += 1
-        authServer.app.logger.info("prune_recovery: deleted " +
-                                   str(recoveryDeleted) +
-                                   " expired requests.")
-    else:
-        authServer.app.logger.info("prune_recovery: no requests found.")
-    authServer.app.logger.info("prune_recovery: done.")
+
+    authServer.app.logger.info("prune_recovery: deleted " +
+                               str(recoveryDeleted) +
+                               " expired requests.")
+
+    # Limpieza de stats
+    limitDate = date.today() - timedelta(days=int(config.stats_days_to_keep))
+    try:
+        result = authServer.db.stats.delete_many({
+            "date": {"$lt": str(limitDate)}
+        })
+        statsDeleted = result.deleted_count
+
+    except Exception as e:
+        return handleDatabasebError(e)
+
+    authServer.app.logger.info("prune_stats: deleted " +
+                               str(statsDeleted) +
+                               " expired stats records.")
+
+    # Fin del proceso
+    authServer.app.logger.info("prune_recovery_stats: done.")
 
     # Armamos el documento a guardar en la base de datos
     pruneLog = {
         "log_type": "task",
         "request_date": datetime.utcnow().isoformat(),
-        "task_type": "prune expired recovery requests",
+        "task_type": "prune expired recovery requests and stats records",
         "api_version": "v" + config.api_version,
-        "pruned_requests": recoveryDeleted
+        "pruned_requests": recoveryDeleted,
+        "pruned_stats": statsDeleted
     }
     try:
         authServer.db.requestlog.insert_one(pruneLog)
@@ -550,209 +556,6 @@ def send_recovery_notification(user, recovery_key, force_send=False):
                                     'Mail data successfully logged to DB.')
 
     return 0
-
-
-# Funcion que calcula las estadisticas de uso del servidor
-def gatherStats(startdate, enddate, sort_ascending):
-
-    # Calculamos numero de dias pedidos
-    number_days = abs((enddate - startdate).days) + 1
-
-    dailyStats = []
-    for day in range(number_days):
-        if (sort_ascending is True):
-            date = startdate + timedelta(days=day)
-        else:
-            date = enddate - timedelta(days=day)
-
-        # Calculos sobre requests
-        requests_number = 0
-        requests_users = 0
-        requests_adminusers = 0
-        requests_sessions = 0
-        requests_recovery = 0
-        requests_error_400 = 0
-        requests_error_401 = 0
-        requests_error_404 = 0
-        requests_error_405 = 0
-        requests_error_500 = 0
-        requests_error_503 = 0
-        # Calculos sobre requests
-        response_time_max = 0
-        response_time_min = sys.float_info.max
-        # Calculos sobre usuarios
-        users_post = 0
-        users_delete = 0
-        sessions_post = 0
-        sessions_delete = 0
-        recovery_post = 0
-
-        # Tomamos los requests del dia, y hacemos los calculos
-        try:
-            day_requests = authServer.\
-                db.\
-                requestlog.\
-                find({"$and": [{"request_date": {"$regex": str(date.date())}},
-                     {"log_type": "request"}]})
-        except Exception as e:
-            return handleDatabasebError(e)
-        while True:
-            try:
-                record = day_requests.next()
-            except StopIteration:
-                break
-
-            requests_number += 1
-
-            if (float(record["duration"]) < response_time_min):
-                response_time_min = float(record["duration"])
-            if (float(record["duration"]) > response_time_max):
-                response_time_max = float(record["duration"])
-
-            if ("/users" in record["path"]):
-                requests_users += 1
-                if (("POST" in record["method"])
-                   and (str(HTTPStatus.CREATED.value)
-                   in str(record["status"]))):
-                    users_post += 1
-                if (("DELETE" in record["method"])
-                   and (str(HTTPStatus.OK.value) in str(record["status"]))):
-                    users_delete += 1
-
-            if ("/adminusers" in record["path"]):
-                requests_adminusers += 1
-
-            if ("/sessions" in record["path"]):
-                requests_sessions += 1
-                if (("POST" in record["method"])
-                   and (str(HTTPStatus.CREATED.value)
-                   in str(record["status"]))):
-                    sessions_post += 1
-                if ("DELETE" in record["method"]
-                   and (str(HTTPStatus.OK.value) in str(record["status"]))):
-                    sessions_delete += 1
-
-            if ("/recovery" in record["path"]):
-                requests_recovery += 1
-                if (("POST" in record["method"])
-                   and (str(HTTPStatus.CREATED.value)
-                   in str(record["status"]))):
-                    recovery_post += 1
-
-            if (str(HTTPStatus.BAD_REQUEST.value) in str(record["status"])):
-                requests_error_400 += 1
-
-            if (str(HTTPStatus.UNAUTHORIZED.value) in str(record["status"])):
-                requests_error_401 += 1
-
-            if (str(HTTPStatus.NOT_FOUND.value) in str(record["status"])):
-                requests_error_404 += 1
-
-            if (str(HTTPStatus.METHOD_NOT_ALLOWED.value)
-               in str(record["status"])):
-                requests_error_405 += 1
-
-            if (str(HTTPStatus.INTERNAL_SERVER_ERROR.value)
-               in str(record["status"])):
-                requests_error_500 += 1
-
-            if (str(HTTPStatus.SERVICE_UNAVAILABLE.value)
-               in str(record["status"])):
-                requests_error_503 += 1
-
-        if (requests_number == 0):
-            response_time_min = 0
-            endpoint_most_requests = None
-        else:
-            requests = {requests_users: "/users",
-                        requests_adminusers: "/adminusers",
-                        requests_sessions: "/sessions",
-                        requests_recovery: "/recovery"}
-            endpoint_most_requests = str(requests.get(max(requests)))
-
-        # Registro a devolver en la respuesta, para cada dia
-        stat = {
-            # fecha
-            "date": str(date.date()),
-            # cant requests en el dia
-            "requests_number": str(requests_number),
-            # hits endpoint users
-            # hits endpoint adminusers
-            # hits endpoint sessions
-            # hits endpoint recovery
-            # requests por minuto para el dia
-            "requests_users": str(requests_users),
-            "requests_adminusers": str(requests_adminusers),
-            "requests_sessions": str(requests_sessions),
-            "requests_recovery": str(requests_recovery),
-            "requests_per_minute": str(float("{:.4f}".
-                                       format(requests_number/1440))),
-            "endpoint_most_requests": endpoint_most_requests,
-            # tiempo de respuesta maximo
-            # tiempo de respuesta minimo
-            # tiempo de respuesta promedio
-            "response_time_max": str(float("{:.4f}".
-                                     format(response_time_max))),
-            "response_time_min": str(float("{:.4f}".
-                                     format(response_time_min))),
-            "response_time_avg":  str(float("{:.4f}".
-                                      format((response_time_max +
-                                              response_time_min)/2))),
-            # cantidad de usuarios nuevos
-            # cantidad de usuario dados de baja
-            # cantidad de sesiones abiertas
-            # cantidad de sesiones cerradas
-            # cantidad recovery abiertos
-            "users_new": str(users_post),
-            "users_deleted": str(users_delete),
-            "sessions_opened": str(sessions_post),
-            "sessions_closed": str(sessions_delete),
-            "recovery_requests": str(recovery_post),
-            # errores 500
-            "requests_error_400": str(requests_error_400),
-            "requests_error_401": str(requests_error_401),
-            "requests_error_404": str(requests_error_404),
-            "requests_error_405": str(requests_error_405),
-            "requests_error_500": str(requests_error_500),
-            "requests_error_503": str(requests_error_503)
-        }
-        dailyStats.append(stat)
-
-    # Respuesta de estadisticas, incluye estadisticas generales
-    # y la lista de dias
-    try:
-        statsResult = {
-                "request_date:":
-                datetime.utcnow().isoformat(),
-                "requested_days":
-                number_days,
-                "registered_users":
-                authServer.db.users.count_documents({}),
-                "registered_users_login_service":
-                authServer.db.users.count_documents({"login_service": True}),
-                "registered_users_active":
-                authServer.db.users.count_documents({"account_closed": False}),
-                "registered_users_closed":
-                authServer.db.users.count_documents({"account_closed": True}),
-                "registered_adminusers":
-                authServer.db.adminusers.count_documents({}),
-                "registered_adminusers_active":
-                authServer.db.adminusers.count_documents(
-                    {"account_closed": False}),
-                "registered_adminusers_closed":
-                authServer.db.adminusers.count_documents(
-                    {"account_closed": True}),
-                "active_sessions":
-                authServer.db.sessions.count_documents({}),
-                "active_recovery":
-                authServer.db.recovery.count_documents({}),
-                "daily_stats":
-                dailyStats
-            }
-    except Exception as e:
-        return handleDatabasebError(e)
-
-    return statsResult
 
 
 # Devuelve el contenido del archivo pasado por parametro

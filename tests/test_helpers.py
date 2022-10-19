@@ -41,7 +41,7 @@ class HelpersTestCase(unittest.TestCase):
         self.assertEqual(0, r)
 
     def test_prune_recovery_should_return_0(self):
-        r = helpers.prune_recovery()
+        r = helpers.prune_recovery_stats()
         self.assertEqual(0, r)
 
     def test_config_log_should_return_0(self):

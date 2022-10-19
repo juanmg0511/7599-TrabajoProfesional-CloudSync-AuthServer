@@ -30,7 +30,7 @@ from flask_talisman import Talisman
 import auth_server_config as config
 # Importacion de clases necesarias
 from src import home, adminusers, users, sessions, recovery, \
-                requestlog, helpers
+                requestlog, stats, helpers
 
 # Inicializacion de la api
 app = Flask(__name__)
@@ -110,6 +110,11 @@ def on_starting(server):
     # Logueo de los valores configurados mediante variables de entorno
     helpers.config_log()
 
+    # Hacemos limpieza de sessions, recovery y stats al iniciar el
+    # servidor, independientemente de la configuracion scheduleada
+    helpers.prune_sessions()
+    helpers.prune_recovery_stats()
+
     # Inicializacion del scheduler utilizado para limpiar las collections
     # de tokens vencidos
     app.logger.debug("Configuring BackgroundScheduler for Gunicorn.")
@@ -130,13 +135,13 @@ def on_starting(server):
 
     # Limpia la tabla de recoveries vencidas
     # Frecuencia PRUNE_INTERVAL_RECOVERY_SECONDS
-    app.logger.debug("Configuring recovery prune job, interval " +
+    app.logger.debug("Configuring recovery and stats prune job, interval " +
                      str(config.prune_interval_recovery) + " seconds.")
-    scheduler.add_job(func=helpers.prune_recovery,
+    scheduler.add_job(func=helpers.prune_recovery_stats,
                       coalesce=True, max_instances=1,
                       trigger="interval",
                       seconds=int(config.prune_interval_recovery),
-                      id="auth_server_prune_recovery",
+                      id="auth_server_prune_recovery_stats",
                       replace_existing=True)
 
     scheduler.start()
@@ -158,6 +163,7 @@ def after_request(response):
     app.logger.debug(helpers.log_request_id() +
                      'Excecuting after request actions.')
     requestlog.log_request(response)
+    stats.update_stats(response)
 
     return response
 
@@ -165,10 +171,6 @@ def after_request(response):
 # Defincion de los endpoints del server
 api.add_resource(home.Home,
                  "/")
-api.add_resource(home.Ping,
-                 "/ping")
-api.add_resource(home.Stats,
-                 "/stats")
 api.add_resource(home.Status,
                  "/status")
 api.add_resource(adminusers.AllAdminUsers,
@@ -193,6 +195,9 @@ api.add_resource(recovery.Recovery,
                  config.api_path + "/recovery/<string:username>")
 api.add_resource(requestlog.RequestLog,
                  config.api_path + "/requestlog")
+api.add_resource(stats.Stats,
+                 config.api_path + "/stats")
+
 
 # Wrappeamos con Talisman a la aplicacion Flask
 # Solo permitimos http para el ambiente de desarrollo

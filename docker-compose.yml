@@ -37,8 +37,10 @@ services:
       RECOVERY_LENGTH_MINUTES: 7200
       # Setear el intervalo de limpieza de sessions, en segundos
       PRUNE_INTERVAL_SESSIONS_SECONDS: 60
-      # Setear el intervalo de limpieza de recovery, en segundos
-      PRUNE_INTERVAL_RECOVERY_SECONDS: 120
+      # Setear el intervalo de limpieza de recovery y stats, en segundos
+      PRUNE_INTERVAL_RECOVERY_STATS_SECONDS: 120
+      # Dias de stats a mantener
+      STATS_DAYS_TO_KEEP: 30
       # Configuracion de correo
       SENDMAIL_ACTIVE: "1"
       SENDMAIL_SERVER: "auth-server-mailhog"
