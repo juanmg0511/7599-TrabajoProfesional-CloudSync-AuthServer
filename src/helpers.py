@@ -73,6 +73,18 @@ def log_reqId(view_function):
     return check_and_log_req_id
 
 
+# Funcion que devuelve el mensaje de error en caso que se produzca algun
+# problema durante la ejecucion de una operacion con la base de datos de
+# logs
+def handleLogDatabasebError(e):
+
+    authServer.app.logger.warning(log_request_id() + "Error excecuting a " +
+                                  "log database operation: " +
+                                  str(e))
+
+    return
+
+
 # Funcion que devuelve el mensaje de error y se encarga de finalizar el
 # request en caso que se produzca algun problema durante la ejecucion de
 # una operacion con la base de datos
@@ -105,6 +117,8 @@ def config_log():
                                config.mongodb_hostname)
     authServer.app.logger.debug("Database name: " +
                                 config.mongodb_database)
+    authServer.app.logger.debug("Log database name: " +
+                                config.mongodb_log_database)
     authServer.app.logger.debug("Database username: " +
                                 config.mongodb_username)
     authServer.app.logger.debug("Database using SSL: " +
@@ -211,9 +225,9 @@ def prune_sessions():
         "pruned_sessions": sessionsDeleted
     }
     try:
-        authServer.db.requestlog.insert_one(pruneSession)
+        authServer.db_log.requestlog.insert_one(pruneSession)
     except Exception as e:
-        return handleDatabasebError(e)
+        return handleLogDatabasebError(e)
     authServer.app.logger.debug('Prune expired sessions:' +
                                 ' task data successfully logged to DB.')
 
@@ -244,13 +258,13 @@ def prune_recovery_stats():
     # Limpieza de stats
     limitDate = date.today() - timedelta(days=int(config.stats_days_to_keep))
     try:
-        result = authServer.db.stats.delete_many({
+        result = authServer.db_log.stats.delete_many({
             "date": {"$lt": str(limitDate)}
         })
         statsDeleted = result.deleted_count
 
     except Exception as e:
-        return handleDatabasebError(e)
+        return handleLogDatabasebError(e)
 
     authServer.app.logger.info("prune_stats: deleted " +
                                str(statsDeleted) +
@@ -269,9 +283,9 @@ def prune_recovery_stats():
         "pruned_stats": statsDeleted
     }
     try:
-        authServer.db.requestlog.insert_one(pruneLog)
+        authServer.db_log.requestlog.insert_one(pruneLog)
     except Exception as e:
-        return handleDatabasebError(e)
+        return handleLogDatabasebError(e)
     authServer.app.logger.debug('Prune expired recovery requests: ' +
                                 'task data successfully logged to DB.')
 
@@ -549,9 +563,9 @@ def send_recovery_notification(user, recovery_key, force_send=False):
             "exception_message": exception
         }
         try:
-            authServer.db.requestlog.insert_one(mailLog)
+            authServer.db_log.requestlog.insert_one(mailLog)
         except Exception as e:
-            return handleDatabasebError(e)
+            return handleLogDatabasebError(e)
         authServer.app.logger.debug(log_request_id() +
                                     'Mail data successfully logged to DB.')
 

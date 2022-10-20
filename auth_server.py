@@ -67,29 +67,54 @@ logo_cs_prod = helpers.loadTextFile("templates/logo-cs-prod.b64")
 # Inicializacion del sistema de correo
 mail = Mail(app)
 
-# Inicializacion de la base de datos, MongoDB
-app.config["MONGO_URI"] = "mongodb://" + \
-                          config.mongodb_username + \
-                          ":" + \
-                          config.mongodb_password + \
-                          "@" + \
-                          config.mongodb_hostname + \
-                          "/" + \
-                          config.mongodb_database + \
-                          "?ssl=" + \
-                          config.mongodb_ssl +\
-                          ("" if (config.mongodb_replica_set == "None") else
-                              ("&replicaSet=" +
-                                  config.mongodb_replica_set)) + \
-                          ("" if (config.mongodb_auth_source) == "None" else
-                              ("&authSource=" +
-                                  config.mongodb_auth_source)) + \
-                          "&retryWrites=true" + \
-                          "&w=majority"
+# Inicializacion de la base de datos de aplicacion, MongoDB
+app.config["MONGO_APP_URI"] = "mongodb://" + \
+                            config.mongodb_username + \
+                            ":" + \
+                            config.mongodb_password + \
+                            "@" + \
+                            config.mongodb_hostname + \
+                            "/" + \
+                            config.mongodb_database + \
+                            "?ssl=" + \
+                            config.mongodb_ssl +\
+                            ("" if (config.mongodb_replica_set == "None") else
+                                ("&replicaSet=" +
+                                    config.mongodb_replica_set)) + \
+                            ("" if (config.mongodb_auth_source) == "None" else
+                                ("&authSource=" +
+                                    config.mongodb_auth_source)) + \
+                            "&retryWrites=true" + \
+                            "&w=majority"
 
-mongo = PyMongo(app)
-db = mongo.db
-cl = mongo.cx
+# Inicializacion de la base de datos de logs, MongoDB
+app.config["MONGO_LOG_URI"] = "mongodb://" + \
+                            config.mongodb_username + \
+                            ":" + \
+                            config.mongodb_password + \
+                            "@" + \
+                            config.mongodb_hostname + \
+                            "/" + \
+                            config.mongodb_log_database + \
+                            "?ssl=" + \
+                            config.mongodb_ssl +\
+                            ("" if (config.mongodb_replica_set == "None") else
+                                ("&replicaSet=" +
+                                    config.mongodb_replica_set)) + \
+                            ("" if (config.mongodb_auth_source) == "None" else
+                                ("&authSource=" +
+                                    config.mongodb_auth_source)) + \
+                            "&retryWrites=true" + \
+                            "&w=majority"
+
+
+mongo_app = PyMongo(app, uri=app.config["MONGO_APP_URI"])
+db = mongo_app.db
+cl = mongo_app.cx
+
+mongo_log = PyMongo(app, uri=app.config["MONGO_LOG_URI"])
+db_log = mongo_log.db
+cl_log = mongo_log.cx
 
 
 # Inicializacion - para cuando ejecuta gunicorn + flask

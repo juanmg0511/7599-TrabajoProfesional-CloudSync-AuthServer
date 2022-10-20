@@ -83,6 +83,7 @@ services:
       GOOGLE_CLIENT_ID: "*"
       # Datos para conectarse a la DB
       MONGODB_DATABASE: "auth-server-db"
+      MONGODB_LOG_DATABASE: "auth-server-log"
       MONGODB_USERNAME: "authserveruser"
       MONGODB_PASSWORD: "123456"
       MONGODB_HOSTNAME: "auth-server-mongodb:27017"
@@ -114,6 +115,7 @@ services:
       MONGO_NON_ROOT_USERNAME: authserveruser
       MONGO_NON_ROOT_PASSWORD: 123456
       MONGODB_DATABASE: auth-server-db
+      MONGODB_LOG_DATABASE: auth-server-log
       MONGODB_DATA_DIR: /data/db
       MONDODB_LOG_DIR: /dev/null
     volumes:

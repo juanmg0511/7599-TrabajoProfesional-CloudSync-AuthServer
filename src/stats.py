@@ -38,11 +38,11 @@ def update_stats(response):
     # Buscamos el registro de stats en la base de datos
     try:
         today_stats = authServer.\
-                      db.\
+                      db_log.\
                       stats.\
                       find_one({"date": {"$regex": str(date.today())}})
     except Exception as e:
-        return helpers.handleDatabasebError(e)
+        return helpers.handleLogDatabasebError(e)
 
     # Por default, vamos a asumir que no existe y que hay que
     # crearlo
@@ -200,13 +200,13 @@ def update_stats(response):
     # Insertamos o actualizamos el registro en la base de datos
     try:
         if new_record is True:
-            authServer.db.stats.insert_one(
+            authServer.db_log.stats.insert_one(
                 stat)
         else:
-            authServer.db.stats.update_one(
+            authServer.db_log.stats.update_one(
                 {"date": stat["date"]}, {'$set': stat})
     except Exception as e:
-        return helpers.handleDatabasebError(e)
+        return helpers.handleLogDatabasebError(e)
 
     authServer.app.logger.debug(helpers.log_request_id() +
                                 'Daily stats data successfully updated in DB.')
@@ -256,7 +256,7 @@ class Stats(Resource):
         # y la lista de dias
         try:
             # Obtenemos los registros de estadisticas
-            dailyStats = authServer.db.stats.\
+            dailyStats = authServer.db_log.stats.\
                 find({}).\
                 sort("date", sort_ascending)
             dailyStatsDict = [doc for doc in dailyStats]
@@ -299,6 +299,6 @@ class Stats(Resource):
                 dailyStatsArray
             }
         except Exception as e:
-            return helpers.handleDatabasebError(e)
+            return helpers.handleLogDatabasebError(e)
 
         return helpers.return_request(statsResponseGet, HTTPStatus.OK)

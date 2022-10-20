@@ -78,6 +78,7 @@ page_max_size_default = 100
 google_client_id_default = None
 mongodb_hostname_default = "127.0.0.1"
 mongodb_database_default = "auth-server-db:27017"
+mongodb_log_database_default = "auth-server-log:27017"
 mongodb_username_default = "authserveruser"
 mongodb_password_default = "*"
 mongodb_ssl_default = "false"
@@ -212,6 +213,8 @@ mongodb_hostname = os.environ.get("MONGODB_HOSTNAME",
                                   mongodb_hostname_default)
 mongodb_database = os.environ.get("MONGODB_DATABASE",
                                   mongodb_database_default)
+mongodb_log_database = os.environ.get("MONGODB_LOG_DATABASE",
+                                      mongodb_log_database_default)
 mongodb_username = os.environ.get("MONGODB_USERNAME",
                                   mongodb_username_default)
 mongodb_password = os.environ.get("MONGODB_PASSWORD",
