@@ -27,26 +27,6 @@
 					"response": []
 				},
 				{
-					"name": "Ping",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/ping",
-							"protocol": "https",
-							"host": [
-								"fiuba-qa-7599-cs-auth-server",
-								"herokuapp",
-								"com"
-							],
-							"path": [
-								"ping"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Status",
 					"request": {
 						"method": "GET",
@@ -61,40 +41,6 @@
 							],
 							"path": [
 								"status"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Stats",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/stats?startdate=2022-06-01&enddate=2022-06-05&sort_ascending=false",
-							"protocol": "https",
-							"host": [
-								"fiuba-qa-7599-cs-auth-server",
-								"herokuapp",
-								"com"
-							],
-							"path": [
-								"stats"
-							],
-							"query": [
-								{
-									"key": "startdate",
-									"value": "2022-06-01"
-								},
-								{
-									"key": "enddate",
-									"value": "2022-06-05"
-								},
-								{
-									"key": "sort_ascending",
-									"value": "false"
-								}
 							]
 						}
 					},
@@ -117,7 +63,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/adminusers",
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/adminusers?start=0&limit=0&show_closed=false&sort_column=username&sort_order=-1",
 							"protocol": "https",
 							"host": [
 								"fiuba-qa-7599-cs-auth-server",
@@ -128,6 +74,33 @@
 								"api",
 								"v1",
 								"adminusers"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "show_closed",
+									"value": "false"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -174,7 +147,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/adminusers/cloudsyncgod/sessions",
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/adminusers/cloudsyncgod/sessions?start=0&limit=0&sort_column=username&sort_order=-1",
 							"protocol": "https",
 							"host": [
 								"fiuba-qa-7599-cs-auth-server",
@@ -187,6 +160,24 @@
 								"adminusers",
 								"cloudsyncgod",
 								"sessions"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -342,6 +333,36 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete an Admin User's sessions (logout)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "11150657-b3c0-4d0a-9f03-76f41ee198de",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/adminusers/admin1/sessions",
+							"protocol": "https",
+							"host": [
+								"fiuba-qa-7599-cs-auth-server",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"adminusers",
+								"admin1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -360,7 +381,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/users",
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/users?start=0&limit=0&show_closed=false&sort_column=username&sort_order=-1",
 							"protocol": "https",
 							"host": [
 								"fiuba-qa-7599-cs-auth-server",
@@ -371,6 +392,33 @@
 								"api",
 								"v1",
 								"users"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "show_closed",
+									"value": "false"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -417,7 +465,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/users/juan0511/sessions",
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/users/juan0511/sessions?start=0&limit=0&sort_column=username&sort_order=-1",
 							"protocol": "https",
 							"host": [
 								"fiuba-qa-7599-cs-auth-server",
@@ -430,6 +478,24 @@
 								"users",
 								"juan0511",
 								"sessions"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -660,6 +726,36 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete a User's sessions (logout)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "11150657-b3c0-4d0a-9f03-76f41ee198de",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/users/juan0511/sessions",
+							"protocol": "https",
+							"host": [
+								"fiuba-qa-7599-cs-auth-server",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"juan0511",
+								"sessions"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -678,7 +774,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/sessions",
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/sessions?start=0&limit=0&sort_column=username&sort_order=-1",
 							"protocol": "https",
 							"host": [
 								"fiuba-qa-7599-cs-auth-server",
@@ -689,6 +785,29 @@
 								"api",
 								"v1",
 								"sessions"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -825,6 +944,34 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete all sessions (logout)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "11150657-b3c0-4d0a-9f03-76f41ee198de",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/sessions",
+							"protocol": "https",
+							"host": [
+								"fiuba-qa-7599-cs-auth-server",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -843,7 +990,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/recovery",
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/recovery?start=0&limit=0&sort_column=username&sort_order=-1",
 							"protocol": "https",
 							"host": [
 								"fiuba-qa-7599-cs-auth-server",
@@ -854,6 +1001,29 @@
 								"api",
 								"v1",
 								"recovery"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -962,6 +1132,35 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete a user's password recovery request",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "11150657-b3c0-4d0a-9f03-76f41ee198de",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/recovery/juan0511",
+							"protocol": "https",
+							"host": [
+								"fiuba-qa-7599-cs-auth-server",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"recovery",
+								"juan0511"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -969,7 +1168,7 @@
 			"name": "Request Log",
 			"item": [
 				{
-					"name": "View Request",
+					"name": "Request Log",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1004,6 +1203,45 @@
 								{
 									"key": "filter",
 									"value": "{\"comparator\": \"eq\",\"field\": \"request_id\",\"value\": \"a8e8c88a-d714-418d-ac5c-b724ef159586\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stats",
+			"item": [
+				{
+					"name": "Request Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "11150657-b3c0-4d0a-9f03-76f41ee198de",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://fiuba-qa-7599-cs-auth-server.herokuapp.com/api/v1/stats?sort_ascending=false",
+							"protocol": "https",
+							"host": [
+								"fiuba-qa-7599-cs-auth-server",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"stats"
+							],
+							"query": [
+								{
+									"key": "sort_ascending",
+									"value": "false"
 								}
 							]
 						}

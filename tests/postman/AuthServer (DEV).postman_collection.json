@@ -29,28 +29,6 @@
 					"response": []
 				},
 				{
-					"name": "Ping",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:81/ping",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "81",
-							"path": [
-								"ping"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Status",
 					"request": {
 						"method": "GET",
@@ -67,42 +45,6 @@
 							"port": "81",
 							"path": [
 								"status"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Stats",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:81/stats?startdate=2022-05-25&enddate=2022-05-29&sort_ascending=false",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "81",
-							"path": [
-								"stats"
-							],
-							"query": [
-								{
-									"key": "startdate",
-									"value": "2022-05-25"
-								},
-								{
-									"key": "enddate",
-									"value": "2022-05-29"
-								},
-								{
-									"key": "sort_ascending",
-									"value": "false"
-								}
 							]
 						}
 					},
@@ -125,7 +67,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:81/api/v1/adminusers",
+							"raw": "http://127.0.0.1:81/api/v1/adminusers?start=0&limit=0&show_closed=false&sort_column=username&sort_order=-1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -138,6 +80,33 @@
 								"api",
 								"v1",
 								"adminusers"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "show_closed",
+									"value": "false"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -186,7 +155,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:81/api/v1/adminusers/cloudsyncgod/sessions",
+							"raw": "http://127.0.0.1:81/api/v1/adminusers/cloudsyncgod/sessions?start=0&limit=0&sort_column=username&sort_order=-1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -201,6 +170,24 @@
 								"adminusers",
 								"cloudsyncgod",
 								"sessions"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -364,6 +351,47 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete all sessions (logout) for adminuser",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/adminusers/admin1/sessions",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"adminusers",
+								"admin1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -382,7 +410,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:81/api/v1/users",
+							"raw": "http://127.0.0.1:81/api/v1/users?start=0&limit=0&show_closed=false&sort_column=username&sort_order=-1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -395,6 +423,33 @@
 								"api",
 								"v1",
 								"users"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "show_closed",
+									"value": "false"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -443,7 +498,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:81/api/v1/users/juan0511/sessions",
+							"raw": "http://127.0.0.1:81/api/v1/users/dmf16/sessions?start=0&limit=0&sort_column=session_token&sort_order=-1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -456,8 +511,26 @@
 								"api",
 								"v1",
 								"users",
-								"juan0511",
+								"dmf16",
 								"sessions"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "sort_column",
+									"value": "session_token"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -700,6 +773,47 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete all sessions (logout) for user",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/users/dmf5/sessions",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"dmf5",
+								"sessions"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -718,7 +832,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:81/api/v1/sessions",
+							"raw": "http://127.0.0.1:81/api/v1/sessions?start=0&limit=0&sort_column=username&sort_order=-1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -731,6 +845,29 @@
 								"api",
 								"v1",
 								"sessions"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -875,6 +1012,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete all sessions (logout)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/sessions?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NjYyOTQxMTMsIm5iZiI6MTY2NjI5NDExMywianRpIjoiOTcxMzc2NTctMTY2ZC00OTk5LTkxNzMtMTY5ZjlhMjhmOTczIiwiaWRlbnRpdHkiOiJkbWYxNiIsImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyJ9._CVdhIcJo9DTnBNcBM7XHpRmW9xgsgbQyiaKj5Wvd_g",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NjYyOTQxMTMsIm5iZiI6MTY2NjI5NDExMywianRpIjoiOTcxMzc2NTctMTY2ZC00OTk5LTkxNzMtMTY5ZjlhMjhmOTczIiwiaWRlbnRpdHkiOiJkbWYxNiIsImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyJ9._CVdhIcJo9DTnBNcBM7XHpRmW9xgsgbQyiaKj5Wvd_g"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -893,7 +1066,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:81/api/v1/recovery",
+							"raw": "http://127.0.0.1:81/api/v1/recovery?start=0&limit=0&sort_column=username&sort_order=-1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -906,6 +1079,29 @@
 								"api",
 								"v1",
 								"recovery"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "0"
+								},
+								{
+									"key": "user_filter",
+									"value": "juan0511",
+									"disabled": true
+								},
+								{
+									"key": "sort_column",
+									"value": "username"
+								},
+								{
+									"key": "sort_order",
+									"value": "-1"
+								}
 							]
 						}
 					},
@@ -1020,6 +1216,46 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete a user's password recovery request",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/recovery/dmf5",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"recovery",
+								"dmf5"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1038,7 +1274,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:81/api/v1/requestlog?startdate=2022-05-25&enddate=2022-05-26&filter={\"comparator\": \"eq\",\"field\": \"request_id\",\"value\": \"89913d6f-c22b-4a61-93a7-9b88e97849b8\"}",
+							"raw": "http://127.0.0.1:81/api/v1/requestlog?startdate=2022-05-25&enddate=2022-05-26",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -1063,7 +1299,49 @@
 								},
 								{
 									"key": "filter",
-									"value": "{\"comparator\": \"eq\",\"field\": \"request_id\",\"value\": \"89913d6f-c22b-4a61-93a7-9b88e97849b8\"}"
+									"value": "{\"comparator\": \"eq\",\"field\": \"request_id\",\"value\": \"89913d6f-c22b-4a61-93a7-9b88e97849b8\"}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stats",
+			"item": [
+				{
+					"name": "Request Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Client-ID",
+								"value": "ef00a570-7cfc-4638-8cad-d085fd98b6e3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:81/api/v1/stats?sort_ascending=false",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "81",
+							"path": [
+								"api",
+								"v1",
+								"stats"
+							],
+							"query": [
+								{
+									"key": "sort_ascending",
+									"value": "false"
 								}
 							]
 						}
