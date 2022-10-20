@@ -225,14 +225,14 @@ class RequestLog(Resource):
                 try:
                     day_records = authServer.db_log.requestlog.find(query)
                 except Exception as e:
-                    return helpers.handleLogDatabasebError(e)
+                    return helpers.handleDatabasebError(e)
             else:
                 try:
                     day_records = authServer.db_log.requestlog.\
                                 find(query).\
                                 sort([("_id", -1)])
                 except Exception as e:
-                    return helpers.handleLogDatabasebError(e)
+                    return helpers.handleDatabasebError(e)
 
             while True:
                 try:

@@ -299,6 +299,6 @@ class Stats(Resource):
                 dailyStatsArray
             }
         except Exception as e:
-            return helpers.handleLogDatabasebError(e)
+            return helpers.handleDatabasebError(e)
 
         return helpers.return_request(statsResponseGet, HTTPStatus.OK)
