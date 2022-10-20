@@ -234,20 +234,18 @@ class RequestLog(Resource):
                 except Exception as e:
                     return helpers.handleDatabasebError(e)
 
-            while True:
-                try:
-                    record = day_records.next()
-                except StopIteration:
-                    break
+            try:
+                for record in day_records:
+                    numRecords += 1
+                    try:
+                        record["_id"] = str(record["_id"])
+                        record_data = eval(str(record))
+                    except Exception:
+                        record_data = {}
 
-                numRecords += 1
-                try:
-                    record["_id"] = str(record["_id"])
-                    record_data = eval(str(record))
-                except Exception:
-                    record_data = {}
-
-                logRecords.append(record_data)
+                    logRecords.append(record_data)
+            except Exception as e:
+                return helpers.handleDatabasebError(e)
 
         requeslogResponseGet = {
             "request_date:": datetime.utcnow().isoformat(),
