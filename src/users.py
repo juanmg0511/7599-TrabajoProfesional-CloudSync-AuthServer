@@ -325,16 +325,40 @@ class AllUsers(Resource):
             existingUser = \
                 authServer.db.users.find_one(
                     {"username": str.lower(args["username"])})
+
+            existingMailUser = \
+                authServer.db.users.find_one(
+                    {"contact.email": str.lower(email)})
+
             existingAdminUser = \
                 authServer.db.adminusers.find_one(
                     {"username": str.lower(args["username"])})
+
+            existingMailAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"email": str.lower(email)})
+
         except Exception as e:
             return helpers.handleDatabasebError(e)
-        if ((existingUser is not None) or (existingAdminUser is not None)):
+
+        if ((existingUser is not None) or
+           (existingAdminUser is not None)):
             UserResponsePost = {
                 "code": -5,
                 "message": "Bad request. User '" +
                            str.lower(args["username"]) +
+                           "' already exists.",
+                "data": None
+            }
+            return helpers.return_request(UserResponsePost,
+                                          HTTPStatus.BAD_REQUEST)
+
+        if ((existingMailUser is not None) or
+           (existingMailAdminUser is not None)):
+            UserResponsePost = {
+                "code": -6,
+                "message": "Bad request. Email '" +
+                           str.lower(email) +
                            "' already exists.",
                 "data": None
             }
@@ -346,7 +370,7 @@ class AllUsers(Resource):
             "first_name": args["first_name"],
             "last_name": args["last_name"],
             "contact": {
-                            "email": email,
+                            "email": str.lower(email),
                             "phone": phone
                         },
             "avatar": {
@@ -495,11 +519,36 @@ class User(Resource):
             data = None
 
         try:
-            existingUser = authServer.db.users.find_one({"username": username})
+            existingUser = \
+                authServer.db.users.find_one(
+                    {"username": str.lower(username)})
+
+            existingMailUser = \
+                authServer.db.users.find_one(
+                    {"$and": [{"contact.email": {"$eq": str.lower(email)}},
+                              {"username": {"$ne": str.lower(username)}}]})
+
+            existingMailAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"email": str.lower(email)})
+
         except Exception as e:
             return helpers.handleDatabasebError(e)
+
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
+
+                if ((existingMailUser is not None) or
+                   (existingMailAdminUser is not None)):
+                    UserResponsePost = {
+                        "code": -4,
+                        "message": "Bad request. Email '" +
+                                   str.lower(email) +
+                                   "' already exists.",
+                        "data": None
+                    }
+                    return helpers.return_request(UserResponsePost,
+                                                  HTTPStatus.BAD_REQUEST)
 
                 if (isUrl is None):
                     isUrl = existingUser["avatar"]["isUrl"]
@@ -509,7 +558,7 @@ class User(Resource):
                     "first_name": args["first_name"],
                     "last_name": args["last_name"],
                     "contact": {
-                        "email": email,
+                        "email": str.lower(email),
                         "phone": phone
                     },
                     "avatar": {
@@ -535,7 +584,7 @@ class User(Resource):
                 return helpers.return_request(UserResponsePut, HTTPStatus.OK)
 
             UserResponsePut = {
-                "code": -4,
+                "code": -5,
                 "message": "User '" + username + "' account is closed.",
                 "data:": None
             }

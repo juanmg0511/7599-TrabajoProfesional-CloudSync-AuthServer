@@ -242,17 +242,43 @@ class AllAdminUsers(Resource):
                                    "' requested.")
 
         try:
-            existingUser = authServer.db.users.find_one(
-                {"username": str.lower(args["username"])})
-            existingAdminUser = authServer.db.adminusers.find_one(
-                {"username": str.lower(args["username"])})
+            existingUser = \
+                authServer.db.users.find_one(
+                    {"username": str.lower(args["username"])})
+
+            existingMailUser = \
+                authServer.db.users.find_one(
+                    {"contact.email": str.lower(args["email"])})
+
+            existingAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"username": str.lower(args["username"])})
+
+            existingMailAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"email": str.lower(args["email"])})
+
         except Exception as e:
             return helpers.handleDatabasebError(e)
-        if ((existingUser is not None) or (existingAdminUser is not None)):
+
+        if ((existingUser is not None) or
+           (existingAdminUser is not None)):
             UserResponsePost = {
                 "code": -2,
                 "message": "Bad request. Admin user '" +
                            str.lower(args["username"]) +
+                           "' already exists.",
+                "data": None
+            }
+            return helpers.return_request(UserResponsePost,
+                                          HTTPStatus.BAD_REQUEST)
+
+        if ((existingMailUser is not None) or
+           (existingMailAdminUser is not None)):
+            UserResponsePost = {
+                "code": -3,
+                "message": "Bad request. Email '" +
+                           str.lower(args["email"]) +
                            "' already exists.",
                 "data": None
             }
@@ -264,7 +290,7 @@ class AllAdminUsers(Resource):
             "password": custom_app_context.hash(args["password"]),
             "first_name": args["first_name"],
             "last_name": args["last_name"],
-            "email": args["email"],
+            "email": str.lower(args["email"]),
             "account_closed": False,
             "date_created": datetime.utcnow().isoformat(),
             "date_updated": None
@@ -363,17 +389,41 @@ class AdminUser(Resource):
                                           HTTPStatus.BAD_REQUEST)
 
         try:
-            existingUser = authServer.db.adminusers.find_one(
-                {"username": username})
+            existingUser = \
+                authServer.db.adminusers.find_one(
+                    {"username": str.lower(username)})
+
+            existingMailUser = \
+                authServer.db.users.find_one(
+                    {"contact.email": str.lower(args["email"])})
+
+            existingMailAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"$and": [{"email": {"$eq": str.lower(args["email"])}},
+                              {"username": {"$ne": str.lower(username)}}]})
+
         except Exception as e:
             return helpers.handleDatabasebError(e)
+
         if (existingUser is not None):
             if (existingUser["account_closed"] is False):
+
+                if ((existingMailUser is not None) or
+                   (existingMailAdminUser is not None)):
+                    UserResponsePost = {
+                        "code": -4,
+                        "message": "Bad request. Email '" +
+                                   str.lower(args["email"]) +
+                                   "' already exists.",
+                        "data": None
+                    }
+                    return helpers.return_request(UserResponsePost,
+                                                  HTTPStatus.BAD_REQUEST)
 
                 userToUpdate = {
                     "first_name": args["first_name"],
                     "last_name": args["last_name"],
-                    "email": args["email"],
+                    "email": str.lower(args["email"]),
                     "account_closed": existingUser["account_closed"],
                     "date_created": existingUser["date_created"],
                     "date_updated": datetime.utcnow().isoformat()

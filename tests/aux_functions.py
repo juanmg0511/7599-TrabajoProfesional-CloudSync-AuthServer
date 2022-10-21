@@ -21,7 +21,7 @@ def createTestUserRaw(username):
                     last_name="test",
                     contact=dict(
                         phone="1545642323",
-                        email="test@mail.com"
+                        email=username + "@mail.com"
                     )
     )
 
@@ -40,7 +40,7 @@ def createTestUser(username, cls):
                      last_name="test",
                      contact=dict(
                          phone="1545642323",
-                         email="test@mail.com"
+                         email=username + "@mail.com"
                          )
                      )
                  )
@@ -58,7 +58,7 @@ def createTestUserService(username, cls):
                      login_service=True,
                      contact=dict(
                          phone="1545642323",
-                         email="test@mail.com"
+                         email=username + "@mail.com"
                         )
                      )
                  )
@@ -89,7 +89,7 @@ def createAdminTestUser(username, cls):
                      password="password",
                      first_name="test",
                      last_name="test",
-                     email="test@mail.com"
+                     email=username + "@mail.com"
                     )
                  )
 

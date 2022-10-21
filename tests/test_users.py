@@ -84,7 +84,7 @@ class UsersTestCase(unittest.TestCase):
                               last_name="test",
                               contact=dict(
                                   phone="1545642323",
-                                  email="test@mail.com"
+                                  email="testunituser_post@mail.com"
                                   ),
                               avatar=dict(
                                 isUrl=True,
@@ -141,7 +141,7 @@ class UsersTestCase(unittest.TestCase):
                               last_name="test",
                               contact=dict(
                                   phone="1545642323",
-                                  email="test@mail.com"
+                                  email="testunituser_post_bad_rq@mail.com"
                                   ),
                               avatar=dict(
                                   url="testmalurl"
@@ -162,7 +162,7 @@ class UsersTestCase(unittest.TestCase):
                               last_name="test",
                               contact=dict(
                                   phone="1545642323",
-                                  email="test@mail.com"
+                                  email="testunituser_post_bad_rq@mail.com"
                                   )
                               )
                           )
@@ -219,7 +219,7 @@ class UsersTestCase(unittest.TestCase):
                              last_name="test",
                              contact=dict(
                                  phone="1545642323",
-                                 email="test@mail.com"
+                                 email="testunituser_put_bad_request@mail.com"
                                  )
                              )
                          )
@@ -251,7 +251,7 @@ class UsersTestCase(unittest.TestCase):
                              last_name="test",
                              contact=dict(
                                  phone="1545642323",
-                                 email="test@mail.com"
+                                 email="testunituser_put_bad_request@mail.com"
                                  ),
                              avatar=dict(
                                  url="testmalurl"
@@ -270,7 +270,7 @@ class UsersTestCase(unittest.TestCase):
                              last_name="test",
                              contact=dict(
                                  phone="1545642323",
-                                 email="test@mail.com"
+                                 email="testunituser_put@mail.com"
                                  ),
                              avtar=dict(
                                 isUrl=True,
@@ -290,7 +290,7 @@ class UsersTestCase(unittest.TestCase):
                              last_name="test",
                              contact=dict(
                                  phone="1545642323",
-                                 email="test@mail.com"
+                                 email="testunituser_put_not_found@mail.com"
                                  )
                              )
                          )
@@ -534,7 +534,7 @@ class UsersTestCase(unittest.TestCase):
                          json=dict(
                               first_name="test",
                               last_name="test",
-                              email="test@mail.com"
+                              email="testunituser_get_closed@mail.com"
                               )
                          )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)

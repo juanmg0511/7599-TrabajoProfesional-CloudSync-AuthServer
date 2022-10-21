@@ -88,7 +88,7 @@ class AdminusersTestCase(unittest.TestCase):
                               password="password",
                               first_name="test",
                               last_name="test",
-                              email="test@mail.com"
+                              email="testunitadminuser_post@mail.com"
                               )
                           )
         self.assertEqual(HTTPStatus.CREATED, r.status_code)
@@ -117,7 +117,7 @@ class AdminusersTestCase(unittest.TestCase):
                               password="password",
                               first_name="test",
                               last_name="test",
-                              email="test@mail.com"
+                              email="testunitadminuser_post_bad_rq@mail.com"
                               )
                           )
         self.assertEqual(HTTPStatus.BAD_REQUEST, r.status_code)
@@ -185,7 +185,7 @@ class AdminusersTestCase(unittest.TestCase):
                          json=dict(
                              first_name="test",
                              last_name="test",
-                             email="test@mail.com"
+                             email="testunitadminuser_put@mail.com"
                              )
                          )
         self.assertEqual(HTTPStatus.OK, r.status_code)
@@ -198,7 +198,7 @@ class AdminusersTestCase(unittest.TestCase):
                          json=dict(
                              first_name="test",
                              last_name="test",
-                             email="test@mail.com"
+                             email="testunitadminuser_put_not_found@mail.com"
                              )
                          )
         self.assertEqual(HTTPStatus.NOT_FOUND, r.status_code)
