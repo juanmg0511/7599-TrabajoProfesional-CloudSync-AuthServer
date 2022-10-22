@@ -993,3 +993,74 @@ class UserSessions(Resource):
         }
         return helpers.return_request(SessionResponseDelete,
                                       HTTPStatus.NOT_FOUND)
+
+
+# Clase que define el endpoint para chequear si existe un usuario
+# verbo GET - chequear si existe el usuario
+class UserExists(Resource):
+
+    # verbo GET - chequear si existe el usuario
+    @helpers.require_apikey
+    @helpers.log_reqId
+    def get(self, username):
+        # Pasamos el usuario que viene en el path a minusculas
+        username = str.lower(username)
+
+        authServer.app.logger.info(helpers.log_request_id() +
+                                   "User or Email existance check for '" +
+                                   username +
+                                   "' requested.")
+
+        try:
+            existingUser = \
+                authServer.db.users.find_one(
+                    {"username": str.lower(username)})
+
+            existingMailUser = \
+                authServer.db.users.find_one(
+                    {"contact.email": str.lower(username)})
+
+            existingAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"username": str.lower(username)})
+
+            existingMailAdminUser = \
+                authServer.db.adminusers.find_one(
+                    {"email": str.lower(username)})
+
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
+
+        if ((existingUser is not None) or
+           (existingAdminUser is not None)):
+            UserResponseGet = {
+                "code": 0,
+                "message": "User '" +
+                           str.lower(username) +
+                           "' already exists.",
+                "data": None
+            }
+            return helpers.return_request(UserResponseGet,
+                                          HTTPStatus.OK)
+
+        if ((existingMailUser is not None) or
+           (existingMailAdminUser is not None)):
+            UserResponseGet = {
+                "code": 1,
+                "message": "Email '" +
+                           str.lower(username) +
+                           "' already exists.",
+                "data": None
+            }
+            return helpers.return_request(UserResponseGet,
+                                          HTTPStatus.OK)
+
+        UserResponseGet = {
+            "code": -1,
+            "message": "User or Email '" +
+                       str.lower(username) +
+                       "' not found.",
+            "data": None
+        }
+        return helpers.return_request(UserResponseGet,
+                                      HTTPStatus.NOT_FOUND)

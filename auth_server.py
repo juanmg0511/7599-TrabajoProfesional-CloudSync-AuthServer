@@ -208,6 +208,8 @@ api.add_resource(users.AllUsers,
                  config.api_path + "/users")
 api.add_resource(users.User,
                  config.api_path + "/users/<string:username>")
+api.add_resource(users.UserExists,
+                 config.api_path + "/users/<string:username>/exists")
 api.add_resource(users.UserSessions,
                  config.api_path + "/users/<string:username>/sessions")
 api.add_resource(sessions.AllSessions,
