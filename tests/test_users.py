@@ -589,6 +589,24 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.NOT_FOUND, r2.status_code)
         self.assertEqual(-1, r2.json["code"])
 
+    def test_get_user_exists_should_return_not_found(self):
+        r = self.app.get('/api/v1/users/testunituser_get_exists/exists',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.NOT_FOUND, r.status_code)
+        self.assertEqual(-1, r.json["code"])
+
+    def test_get_user_exists_existing_user_should_return_ok(self):
+        r = self.app.get('/api/v1/users/testunituser_get/exists',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+        self.assertEqual(0, r.json["code"])
+
+    def test_get_user_exists_existing_email_return_ok(self):
+        r = self.app.get('/api/v1/users/testunituser_get@mail.com/exists',
+                         headers={'X-Client-ID': aux_functions.X_Client_ID})
+        self.assertEqual(HTTPStatus.OK, r.status_code)
+        self.assertEqual(1, r.json["code"])
+
 
 if __name__ == '__main__':
     unittest.main()
