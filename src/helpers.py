@@ -10,7 +10,7 @@
 # OS para leer variables de entorno y logging para escribir los logs
 import io
 import re
-from datetime import date, datetime, timedelta
+from datetime import datetime
 # Flask, para la implementacion del servidor REST
 from flask import request
 from flask_log_request_id import current_request_id
@@ -256,10 +256,18 @@ def prune_recovery_stats():
                                " expired requests.")
 
     # Limpieza de stats
-    limitDate = date.today() - timedelta(days=int(config.stats_days_to_keep))
     try:
+        statsToKeep = authServer.db_log.stats.find().\
+            skip(0).\
+            limit(int(config.stats_days_to_keep)).\
+            sort("date", -1)
+
+        idsStatsToKeep = []
+        for stat in statsToKeep:
+            idsStatsToKeep.append(stat["_id"])
+
         result = authServer.db_log.stats.delete_many({
-            "date": {"$lt": str(limitDate)}
+            "_id": {"$nin": idsStatsToKeep}
         })
         statsDeleted = result.deleted_count
 
