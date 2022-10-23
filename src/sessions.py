@@ -170,20 +170,23 @@ class AllSessions(Resource):
                        "&limit=" +\
                        str(query_limit)
 
-        AllSessionsResultsGet = []
-        for existingSession in AllSessions:
-            retrievedSession = {
-                "id": str(existingSession["_id"]),
-                "username": existingSession["username"],
-                "user_role": existingSession["user_role"],
-                "session_token": existingSession["session_token"],
-                "expired":  (datetime.utcnow() >
-                             datetime.
-                             fromisoformat(existingSession["expires"])),
-                "expires": existingSession["expires"],
-                "date_created": existingSession["date_created"]
-            }
-            AllSessionsResultsGet.append(retrievedSession)
+        try:
+            AllSessionsResultsGet = []
+            for existingSession in AllSessions:
+                retrievedSession = {
+                    "id": str(existingSession["_id"]),
+                    "username": existingSession["username"],
+                    "user_role": existingSession["user_role"],
+                    "session_token": existingSession["session_token"],
+                    "expired": (datetime.utcnow() >
+                                datetime.
+                                fromisoformat(existingSession["expires"])),
+                    "expires": existingSession["expires"],
+                    "date_created": existingSession["date_created"]
+                }
+                AllSessionsResultsGet.append(retrievedSession)
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
 
         # Construimos la respuesta paginada
         AllSessionsResponseGet = {

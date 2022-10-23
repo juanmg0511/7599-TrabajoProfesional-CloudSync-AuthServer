@@ -161,19 +161,22 @@ class AllRecovery(Resource):
                        "&limit=" +\
                        str(query_limit)
 
-        AllRecoveryResultsGet = []
-        for existingRecovery in AllRecoveries:
-            retrievedRecovery = {
-                "id": str(existingRecovery["_id"]),
-                "username": existingRecovery["username"],
-                "email": existingRecovery["email"],
-                "recovery_key": existingRecovery["recovery_key"],
-                "expired":  (datetime.utcnow() > datetime.
-                             fromisoformat(existingRecovery["expires"])),
-                "expires":  existingRecovery["expires"],
-                "date_created": existingRecovery["date_created"]
-            }
-            AllRecoveryResultsGet.append(retrievedRecovery)
+        try:
+            AllRecoveryResultsGet = []
+            for existingRecovery in AllRecoveries:
+                retrievedRecovery = {
+                    "id": str(existingRecovery["_id"]),
+                    "username": existingRecovery["username"],
+                    "email": existingRecovery["email"],
+                    "recovery_key": existingRecovery["recovery_key"],
+                    "expired":  (datetime.utcnow() > datetime.
+                                 fromisoformat(existingRecovery["expires"])),
+                    "expires":  existingRecovery["expires"],
+                    "date_created": existingRecovery["date_created"]
+                }
+                AllRecoveryResultsGet.append(retrievedRecovery)
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
 
         # Construimos la respuesta paginada
         AllRecoveryResponseGet = {

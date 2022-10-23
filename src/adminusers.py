@@ -170,32 +170,32 @@ class AllAdminUsers(Resource):
                        "&limit=" +\
                        str(query_limit)
 
-        AllUsersResultsGet = []
-        for existingUser in allUsers:
+        try:
+            AllUsersResultsGet = []
+            for existingUser in allUsers:
 
-            # Operacion de base de datos
-            try:
+                # Operacion de base de datos
                 userSessionsCount = \
                     authServer.db.sessions.\
                     count_documents({
                         "username": existingUser["username"],
                         "expires": {"$gt": datetime.utcnow().isoformat()}
                         })
-            except Exception as e:
-                return helpers.handleDatabasebError(e)
 
-            retrievedUser = {
-                "id": str(existingUser["_id"]),
-                "username": existingUser["username"],
-                "first_name": existingUser["first_name"],
-                "last_name":  existingUser["last_name"],
-                "email": existingUser["email"],
-                "online": True if (userSessionsCount > 0) else False,
-                "account_closed": existingUser["account_closed"],
-                "date_created": existingUser["date_created"],
-                "date_updated": existingUser["date_updated"]
-            }
-            AllUsersResultsGet.append(retrievedUser)
+                retrievedUser = {
+                    "id": str(existingUser["_id"]),
+                    "username": existingUser["username"],
+                    "first_name": existingUser["first_name"],
+                    "last_name":  existingUser["last_name"],
+                    "email": existingUser["email"],
+                    "online": True if (userSessionsCount > 0) else False,
+                    "account_closed": existingUser["account_closed"],
+                    "date_created": existingUser["date_created"],
+                    "date_updated": existingUser["date_updated"]
+                }
+                AllUsersResultsGet.append(retrievedUser)
+        except Exception as e:
+            return helpers.handleDatabasebError(e)
 
         # Construimos la respuesta paginada
         AllUsersResponseGet = {
@@ -726,19 +726,23 @@ class AdminUserSessions(Resource):
                             "&limit=" +\
                             str(query_limit)
 
-                UserSessionsResultsGet = []
-                for existingSession in AllUserSessions:
-                    if (datetime.utcnow()
-                       <
-                       datetime.fromisoformat(existingSession["expires"])):
-                        retrievedSession = {
-                            "id": str(existingSession["_id"]),
-                            "username": existingSession["username"],
-                            "session_token": existingSession["session_token"],
-                            "expires":  existingSession["expires"],
-                            "date_created": existingSession["date_created"]
-                        }
-                        UserSessionsResultsGet.append(retrievedSession)
+                try:
+                    UserSessionsResultsGet = []
+                    for existingSession in AllUserSessions:
+                        if (datetime.utcnow()
+                           <
+                           datetime.fromisoformat(existingSession["expires"])):
+                            retrievedSession = {
+                                "id": str(existingSession["_id"]),
+                                "username": existingSession["username"],
+                                "session_token":
+                                    existingSession["session_token"],
+                                "expires":  existingSession["expires"],
+                                "date_created": existingSession["date_created"]
+                            }
+                            UserSessionsResultsGet.append(retrievedSession)
+                except Exception as e:
+                    return helpers.handleDatabasebError(e)
 
                 # Construimos la respuesta paginada
                 UserSessionsResponseGet = {
