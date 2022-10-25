@@ -258,6 +258,8 @@ class Stats(Resource):
             # Obtenemos los registros de estadisticas
             dailyStats = authServer.db_log.stats.\
                 find({}).\
+                skip(0).\
+                limit(config.stats_days_to_keep).\
                 sort("date", sort_ascending)
             dailyStatsDict = [doc for doc in dailyStats]
             dailyStatsDictJson = json.\
