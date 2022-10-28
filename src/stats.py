@@ -40,7 +40,7 @@ def update_stats(response):
         today_stats = authServer.\
                       db_log.\
                       stats.\
-                      find_one({"date": {"$regex": str(date.today())}})
+                      find_one({"date": str(date.today())})
     except Exception as e:
         return helpers.handleLogDatabasebError(e)
 
@@ -256,18 +256,8 @@ class Stats(Resource):
         # y la lista de dias
         try:
             # Obtenemos los registros de estadisticas
-            daylyStatsCount = authServer.db_log.stats.\
-                count_documents({})
-
-            query_start = 0
-            if ((daylyStatsCount > int(config.stats_days_to_keep)) and
-               (sort_ascending == 1)):
-                query_start = 1
-
             dailyStats = authServer.db_log.stats.\
                 find({}).\
-                skip(query_start).\
-                limit(int(config.stats_days_to_keep)).\
                 sort("date", sort_ascending)
             dailyStatsDict = [doc for doc in dailyStats]
             dailyStatsDictJson = json.\
