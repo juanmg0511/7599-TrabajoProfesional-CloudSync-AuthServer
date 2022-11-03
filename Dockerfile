@@ -17,6 +17,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
     mkdir /home/appuser/logs && \
     mkdir /home/appuser/src && \
     mkdir /home/appuser/tests && \
+    mkdir /home/appuser/openapi3_0 && \
     mkdir /home/appuser/templates
 # Creating log file
 RUN touch /home/appuser/logs/auth_server.log
@@ -27,6 +28,7 @@ USER appuser
 COPY auth_server.py auth_server_config.py gunicorn_config.py /home/appuser/
 COPY src /home/appuser/src
 COPY templates /home/appuser/templates
+COPY openapi3_0 /home/appuser/openapi3_0
 COPY tests /home/appuser/tests
 # Configuring network and launching server
 WORKDIR /home/appuser/

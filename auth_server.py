@@ -10,6 +10,7 @@
 # Logging para escribir los logs
 import logging
 import atexit
+import json
 # Flask, para la implementacion del servidor REST
 from flask import Flask
 from flask_restful import Api
@@ -25,12 +26,14 @@ from flask_jwt_extended import JWTManager
 from apscheduler.schedulers.background import BackgroundScheduler
 # Flask-Talisman para el manejo de SSL
 from flask_talisman import Talisman
+# Flask-Swagger-Ui para el hosting de la especificacion de la API
+from flask_swagger_ui import get_swaggerui_blueprint
 
 # Importacion de las configuracion del Auth Server
 import auth_server_config as config
 # Importacion de clases necesarias
 from src import home, adminusers, users, sessions, recovery, \
-                requestlog, stats, helpers
+                requestlog, stats, swagger_data, helpers
 
 # Inicializacion de la api
 app = Flask(__name__)
@@ -224,7 +227,23 @@ api.add_resource(requestlog.RequestLog,
                  config.api_path + "/requestlog")
 api.add_resource(stats.Stats,
                  config.api_path + "/stats")
+api.add_resource(swagger_data.SwaggerData,
+                 config.api_path + "/swagger-data")
 
+
+# Configuracion de Swagger
+# Lectura del archivo con la definicion de la API
+swagger_data = helpers.loadTextFile("openapi3_0/openapi3_0.json")
+swagger_data = json.loads(swagger_data)
+# Definicion del path para la UI y locacion del endpoint con definicion
+SWAGGER_URL = config.api_path + '/swagger-ui'
+API_URL = config.api_path + '/swagger-data'
+# Registro del blueprint, disponibiliza Swagger-UI en el server
+swaggerui_blueprint = get_swaggerui_blueprint(
+   SWAGGER_URL,
+   API_URL
+)
+app.register_blueprint(swaggerui_blueprint)
 
 # Wrappeamos con Talisman a la aplicacion Flask
 # Solo permitimos http para el ambiente de desarrollo
@@ -232,6 +251,7 @@ Talisman(app=app,
          force_https=(False if config.app_env == "DEV" else True),
          force_https_permanent=True,
          content_security_policy=None)
+
 
 # Inicio del server en forma directa con WSGI
 # Toma el puerto y modo de las variables de entorno
