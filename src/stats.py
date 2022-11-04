@@ -273,10 +273,12 @@ class Stats(Resource):
                 count_documents({}),
                 "registered_users_login_service":
                 authServer.db.users.
-                count_documents({"login_service": True}),
+                count_documents({"login_service": True,
+                                 "account_closed": False}),
                 "registered_users_active":
                 authServer.db.users.
-                count_documents({"account_closed": False}),
+                count_documents({"login_service": False,
+                                 "account_closed": False}),
                 "registered_users_closed":
                 authServer.db.users.
                 count_documents({"account_closed": True}),
