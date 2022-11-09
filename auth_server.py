@@ -255,7 +255,11 @@ Talisman(app=app,
          force_https=config.talisman_force_https,
          force_https_permanent=True,
          content_security_policy={
-            "default-src": "'self'"})
+            "default-src": "'self'",
+            "style-src": "'self' 'unsafe-inline';",
+            "img-src": "'self' data: validator.swagger.io",
+            "script-src": "'self' 'unsafe-inline'"
+         })
 
 
 # Inicio del server en forma directa con WSGI
