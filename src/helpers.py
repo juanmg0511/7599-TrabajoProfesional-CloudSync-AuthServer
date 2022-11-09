@@ -189,6 +189,13 @@ def config_log():
     authServer.app.logger.debug("Max avatar size is: \"" +
                                 str(config.avatar_max_size) +
                                 "\" Bytes.")
+    authServer.app.logger.info("CORS allowed origins: " +
+                               str(config.cors_allowed_origins))
+    authServer.app.logger.info("Force HTTPS: " +
+                               str(config.talisman_force_https))
+    if (config.talisman_force_https is False):
+        authServer.app.logger.warning("Force HTTPS is DISABLED. " +
+                                      "Please review Talisman config.")
 
     return 0
 

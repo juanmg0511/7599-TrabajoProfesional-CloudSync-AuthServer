@@ -42,9 +42,6 @@ api = Api(app)
 # Inicializacion del parser de request ID
 RequestID(app)
 
-# Habilitacion de CORS
-CORS(app)
-
 # Inicializacion de JWT
 app.config["JWT_SECRET_KEY"] = config.jwt_secret
 jwt = JWTManager(app)
@@ -245,12 +242,20 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 )
 app.register_blueprint(swaggerui_blueprint)
 
+
+# Habilitacion de CORS
+# Solo permitimos los origenes especificados y los vebos utilizados
+CORS(app=app,
+     origins=config.cors_allowed_origins,
+     methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
+
 # Wrappeamos con Talisman a la aplicacion Flask
-# Solo permitimos http para el ambiente de desarrollo
+# Deshabilitado HTTPS en ambiente de desarrollo
 Talisman(app=app,
-         force_https=(False if config.app_env == "DEV" else True),
+         force_https=config.talisman_force_https,
          force_https_permanent=True,
-         content_security_policy=None)
+         content_security_policy={
+            "default-src": "'self'"})
 
 
 # Inicio del server en forma directa con WSGI

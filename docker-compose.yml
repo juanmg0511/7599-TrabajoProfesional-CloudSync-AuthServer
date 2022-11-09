@@ -92,7 +92,11 @@ services:
       MONGODB_AUTH_SOURCE: "None"
       # Secret para los token JWT
       JWT_SECRET: "MINSjxVsRZ6QErNX74wBIUBmm62ExN5"
-
+      # Origenes habilitados en CORS
+      # Lista en formato CSV o "*"
+      CORS_ALLOWED_ORIGINS: "*"
+      # Configuracion de Talisman respecto a HTTPS
+      TALISMAN_FORCE_HTTPS: "False"
     volumes:
        - authserverlogs:/home/appuser/logs
        - ".:/home/appuser/" 
