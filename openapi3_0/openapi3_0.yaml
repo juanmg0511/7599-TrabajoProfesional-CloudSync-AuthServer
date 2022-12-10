@@ -1981,7 +1981,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Stats'
               example:
-                'request_date:': '2022-05-31T14:58:54.787980'
+                request_date:: '2022-05-31T14:58:54.787980'
                 registered_users: 8
                 registered_users_login_service: 0
                 registered_users_active: 5
@@ -1993,26 +1993,26 @@ paths:
                 active_recovery: 0
                 daily_stats:
                   - date: '2022-05-30'
-                    requests_number: '1'
-                    requests_users: '0'
-                    requests_adminusers: '0'
-                    requests_sessions: '1'
-                    requests_recovery: '0'
-                    requests_per_minute: '0.0007'
-                    endpoint_most_requests: /sessions
-                    response_time_max: '0.9576'
-                    response_time_min: '0.9576'
-                    response_time_avg: '0.9576'
-                    users_new: '0'
-                    users_deleted: '0'
-                    sessions_opened: '0'
-                    sessions_closed: '0'
-                    recovery_requests: '0'
-                    requests_error_400: '0'
-                    requests_error_401: '0'
-                    requests_error_404: '0'
-                    requests_error_405: '0'
-                    requests_error_500: '0'
+                    requests_number: 1
+                    requests_users: 0
+                    requests_adminusers: 0
+                    requests_sessions: 1
+                    requests_recovery: 0
+                    requests_per_minute: 0.013194444444444444
+                    response_time_avg: 2.2901225
+                    response_time_max: 4.343952
+                    response_time_min: 0.236293
+                    users_new: 0
+                    users_deleted: 0
+                    sessions_opened: 0
+                    sessions_closed: 0
+                    recovery_requests: 0
+                    requests_error_400: 0
+                    requests_error_401: 0
+                    requests_error_404: 0
+                    requests_error_405: 0
+                    requests_error_500: 0
+                    requests_error_503: 0
         '400':
           description: "Bad request (-1)"
           content:
@@ -2305,101 +2305,102 @@ components:
       properties:
         request_date:
           type: string
+          format: date
           readOnly: true
         registered_users:
-          type: string
+          type: integer
           readOnly: true
         registered_users_login_service:
-          type: string
+          type: integer
           readOnly: true
         registered_users_active:
-          type: string
+          type: integer
           readOnly: true
         registered_users_closed:
-          type: string
+          type: integer
           readOnly: true
         registered_adminusers:
-          type: string
+          type: integer
           readOnly: true
         registered_adminusers_active:
-          type: string
+          type: integer
           readOnly: true
         registered_adminusers_closed:
-          type: string
+          type: integer
           readOnly: true
         active_sessions:
-          type: string
+          type: integer
           readOnly: true
         active_recovery:
-          type: string
+          type: integer
           readOnly: true
         daily_stats:
           type: array
           items:
             $ref: "#/components/schemas/DailyStats"
-          readOnly: true
     DailyStats:
       type: object
       properties:
         date:
           type: string
+          format: date
           readOnly: true
         requests_number:
-          type: string
+          type: integer
           readOnly: true
         requests_adminusers:
-          type: string
+          type: integer
           readOnly: true
         requests_sessions:
-          type: string
+          type: integer
           readOnly: true
         requests_recovery:
-          type: string
+          type: integer
           readOnly: true
         requests_per_minute:
-          type: string
-          readOnly: true
-        endpoint_most_requests:
-          type: string
+          type: number
           readOnly: true
         response_time_max:
-          type: string
+          type: number
           readOnly: true
         response_time_min:
-          type: string
+          type: number
           readOnly: true
         response_time_avg:
-          type: string
+          type: number
           readOnly: true
         users_new:
-          type: string
+          type: integer
           readOnly: true
         users_deleted:
-          type: string
+          type: integer
           readOnly: true    
         sessions_opened:
-          type: string
+          type: integer
           readOnly: true    
         sessions_closed:
-          type: string
+          type: integer
           readOnly: true    
         recovery_requests:
-          type: string
+          type: integer
           readOnly: true    
         requests_error_400:
-          type: string
+          type: integer
           readOnly: true    
         requests_error_401:
-          type: string
+          type: integer
           readOnly: true    
         requests_error_404:
-          type: string
+          type: integer
           readOnly: true    
         requests_error_405:
-          type: string
+          type: integer
           readOnly: true    
         requests_error_500:
-          type: string
+          type: integer
+          readOnly: true
+        requests_error_503:
+          type: integer
           readOnly: true
     PagedRecoveries:
       type: object
