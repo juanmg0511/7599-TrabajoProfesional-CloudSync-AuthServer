@@ -258,7 +258,11 @@ Talisman(app=app,
          force_https=config.talisman_force_https,
          force_https_permanent=True,
          content_security_policy={
-            "default-src": "'self'",
+            "default-src": [
+                "'self'",
+                "fiuba-qa-7599-cs-auth-server.herokuapp.com",
+                "*.7599-fiuba-cs.net"
+            ],
             "style-src": "'self' 'unsafe-inline';",
             "img-src": "'self' data: validator.swagger.io",
             "script-src": "'self' 'unsafe-inline'"
