@@ -238,7 +238,10 @@ API_URL = config.api_path + '/swagger-data'
 # Registro del blueprint, disponibiliza Swagger-UI en el server
 swaggerui_blueprint = get_swaggerui_blueprint(
    SWAGGER_URL,
-   API_URL
+   API_URL,
+   config={
+    'docExpansion': 'none'
+   }
 )
 app.register_blueprint(swaggerui_blueprint)
 
