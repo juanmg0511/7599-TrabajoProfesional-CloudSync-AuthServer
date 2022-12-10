@@ -29,12 +29,23 @@ class SwaggerData(Resource):
 
         # Se configura el titulo y la URL base dinamicamente en base al
         # al ambiente en que se esta ejecutando
+        scheme = "https"
+        if config.app_env == "DEV":
+            scheme = "http"
+
         authServer.swagger_data["info"]["title"] = \
             "FIUBA CloudSync API Reference"
         authServer.swagger_data["servers"] = [
             {
-                "url": request.host_url + config.api_path[1:],
-                "description": "Auth Server" + " - " + config.app_env
+                "url": scheme +
+                "://" +
+                request.host +
+                "/" +
+                config.api_path[1:],
+                "description":
+                "Auth Server" +
+                " - " +
+                config.app_env
             }
         ]
 
