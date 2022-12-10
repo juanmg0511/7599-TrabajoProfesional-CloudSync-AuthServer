@@ -1803,7 +1803,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Server_API_Key": []
+          }
+        ]
       }
     },
     "/sessions": {
@@ -2113,7 +2118,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Server_API_Key": []
+          }
+        ]
       }
     },
     "/sessions/{token}": {

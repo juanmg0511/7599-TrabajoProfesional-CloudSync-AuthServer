@@ -1188,7 +1188,9 @@ paths:
               example:
                 code: -1
                 message: You are not authorized to access this resource.
-                data: null        
+                data: null
+      security:
+        - Server_API_Key: []
   /sessions:
     get:
       summary: Get all sessions
@@ -1391,7 +1393,9 @@ paths:
               example:
                 code: -1
                 message: You are not authorized to access this resource.
-                data: null   
+                data: null
+      security:
+        - Server_API_Key: []
   /sessions/{token}:
     get:
       summary: Get session
