@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "FIUBA CloudSync API Reference",
-    "description": "API guide for the AuthServer<br />1C2022 - FIUBA - 75.99<br /><br />***Github***: https://github.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer",
+    "description": "API guide for the AuthServer<br />1C2022 - FIUBA - 75.99<br /><br />***GitHub***: <a href=\"https://github.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer\" target=\"_blank\">https://github.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer</a>",
     "version": "1.0",
     "license": {
       "name": "GPLv3",
