@@ -2810,13 +2810,13 @@
           },
           {
             "in": "query",
-            "name": "datestart",
+            "name": "startdate",
             "required": true,
             "description": "The starting date of the required period",
             "schema": {
               "type": "string"
             },
-            "example": "2020-05-30"
+            "example": "2022-12-10"
           },
           {
             "in": "query",
@@ -2824,7 +2824,7 @@
             "schema": {
               "type": "string"
             },
-            "example": "2020-05-31",
+            "example": "2022-12-10",
             "required": true,
             "description": "The ending date of the required period"
           },
@@ -3731,7 +3731,7 @@
             "type": "string"
           },
           "value": {
-            "type": "object"
+            "type": "string"
           }
         }
       },

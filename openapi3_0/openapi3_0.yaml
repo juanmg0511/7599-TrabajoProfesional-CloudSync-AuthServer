@@ -1849,17 +1849,17 @@ paths:
           required: false
           description: "***(automatically generated if not present)*** a unique identifier for this request"
         - in: query
-          name: datestart
+          name: startdate
           required: true
           description: The starting date of the required period
           schema:
             type: string
-          example: "2020-05-30"
+          example: "2022-12-10"
         - in: query
           name: enddate
           schema:
             type: string
-          example: "2020-05-31"
+          example: "2022-12-10"
           required: true
           description: The ending date of the required period
         - in: query
@@ -2506,7 +2506,7 @@ components:
         field:
           type: string
         value:
-          type: object
+          type: string
     ReqLogMail:
       type: object
       properties:
