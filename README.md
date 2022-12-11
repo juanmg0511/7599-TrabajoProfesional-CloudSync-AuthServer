@@ -27,6 +27,10 @@ El mismo consiste en la creación de un juego en 2D con mecánicas _roguelike_ c
 - Flask
 - Gunicorn
 
+## Documentación
+
+- [Wiki del Proyecto](https://github.com/juanmg0511/7599-TrabajoProfesional-CloudSync-AuthServer/wiki)
+
 ## Ambientes
 
 ### Production (PR)
